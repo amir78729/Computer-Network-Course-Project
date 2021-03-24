@@ -1,11 +1,13 @@
 import socket
 
-sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)      # For UDP
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)      # For UDP
 
-udp_host = socket.gethostname()		        # Host IP
-udp_port = 53			                # specified port to connect
+# udp_host = socket.gethostname()		        # Host IP
+# udp_port = 53			                # specified port to connect
+#
+# sock.bind((udp_host, udp_port))
 
-sock.bind((udp_host, udp_port))
+
 
 while True:
     print("Waiting for client...")
