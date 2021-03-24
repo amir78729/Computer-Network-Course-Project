@@ -20,5 +20,5 @@ msgFromServer = UDP_client_socket.recvfrom(bufferSize)
 msg = "Message from Server: {}".format(msgFromServer[0])
 print(msg)
 
-DNS_record = socket.gethostbyaddr(server_IP)
+DNS_record = socket.gethostbyname("google.com")
 print(DNS_record)
