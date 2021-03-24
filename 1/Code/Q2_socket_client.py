@@ -2,7 +2,7 @@ import socket
 
 msgFromClient = "Hello Server:)"
 bytesToSend = str.encode(msgFromClient)
-server_IP = '80.80.80.80'
+server_IP = '208.67.222.222'
 server_IP = '127.0.0.1'  # uncomment for testing
 server_port = 53  # the port for DNS
 bufferSize = 512
@@ -17,5 +17,8 @@ print('The message has been sent to Server!\nPORT: {}\nADDRESS: {}'.format(serve
 
 msgFromServer = UDP_client_socket.recvfrom(bufferSize)
 
-msg = "Message from Server {}".format(msgFromServer[0])
+msg = "Message from Server: {}".format(msgFromServer[0])
 print(msg)
+
+DNS_record = socket.gethostbyaddr(server_IP)
+print(DNS_record)
