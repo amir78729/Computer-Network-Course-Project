@@ -13,10 +13,46 @@ if __name__ == '__main__':
                 print("   >>> A record: {}".format(DNS_record))
 
             elif user_input == 2:
-                pass
+
+                # reading from Q3_csv_input.csv
+                with open('Q3_csv_input.csv') as csv_file:
+                    data = []
+                    csv_reader = csv.reader(csv_file, delimiter=',')
+                    line_count = 0
+                    for row in csv_reader:
+                        row_list = []
+                        if line_count == 0:
+                            # print(f'Column names are {", ".join(row)}')
+                            line_count += 1
+                        else:
+                            hostname = row[0]
+                            A_record = socket.gethostbyname(hostname)
+
+                            row_list.append(hostname)
+                            row_list.append(A_record)
+                            line_count += 1
+                            data.append(row_list)
+
+                # writing to Q3_csv_output.csv
+                with open('Q3_csv_output.csv', mode='w') as output_file:
+                    csv_writer = csv.writer(output_file, delimiter=',')
+                    csv_writer.writerow(['hostname', 'A record'])
+                    for d in data:
+                        if d:
+                            csv_writer.writerow(d)
+
+                # printing the output
+                with open('Q3_csv_output.csv') as csv_file:
+                    csv_reader = csv.reader(csv_file, delimiter=',')
+                    line_count = 0
+                    for row in csv_reader:
+                        for col in range(len(row)):
+                            print(row[col], end='\t')
+                        print()
+
             elif user_input == -1:
                 break
             else:
                 print('Wrong input! Try again.')
-        except ValueError:
+        except (socket.gaierror, ValueError):
             print('Wrong input! Try again.')
