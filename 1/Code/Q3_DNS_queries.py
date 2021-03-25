@@ -29,12 +29,21 @@ if __name__ == '__main__':
 
             # importing from a csv file
             elif user_input == 2:
+
+                # counting lines
+                with open('Q3_csv_input.csv') as csv_file:
+                    csv_reader = csv.reader(csv_file, delimiter=',')
+                    lines = len(list(csv_reader)) - 1
+
                 # reading from Q3_csv_input.csv
                 with open('Q3_csv_input.csv') as csv_file:
+                    print('>>> Reading from \"Q3_csv_input.csv\"')
                     data = []
                     csv_reader = csv.reader(csv_file, delimiter=',')
+                    # lines = len(list(csv_reader))
                     line_count = 0
                     for row in csv_reader:
+
                         try:
                             row_list = []
                             if line_count == 0:
@@ -42,23 +51,27 @@ if __name__ == '__main__':
                                 line_count += 1
                             else:
                                 hostname = row[0]
+                                print('   >>> ({}/{}) : {} '.format(line_count, lines, hostname))
                                 row_list.append(hostname)
-                                A_record = socket.gethostbyaddr(hostname)
-                                print(A_record)
+                                host_info = socket.gethostbyaddr(hostname)
+                                # print(A_record)
 
-                                row_list.append(A_record[2][0])
+                                row_list.append(host_info[2][0])
                                 line_count += 1
                                 data.append(row_list)
                         except IndexError:
-                            pass
+                            line_count += 1
                         except socket.herror:
                             # print('Host not found')
                             row_list.append(socket.gethostbyname(hostname))
                             data.append(row_list)
+                            line_count += 1
+                    print()
                 # writing to Q3_csv_output.csv
                 write_on_csv('Q3_csv_output.csv')
 
                 # printing the output
+                print('>>> Output')
                 print(pandas.read_csv('Q3_csv_output.csv'))
 
             # end of program
