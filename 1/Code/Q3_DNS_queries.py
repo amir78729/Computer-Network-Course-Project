@@ -5,16 +5,20 @@ import pandas
 if __name__ == '__main__':
     while True:
         print('-----------------------------')
-        print('Select an Option\n 1 - Enter a Hostname\n 2 - Import from CSV file\n-1 - Exit')
+        print("Select an Option\n"
+              " 1 - Enter a Hostname\n"
+              " 2 - Import from CSV file\n"
+              "-1 - Exit")
         try:
             user_input = int(input())
+            # entering a hostname
             if user_input == 1:
                 hostname = input(">>> Enter a Hostname: ")
                 DNS_record = socket.gethostbyname(hostname)
                 print("   >>> A record: {}".format(DNS_record))
 
+            # importing from a csv file
             elif user_input == 2:
-
                 # reading from Q3_csv_input.csv
                 with open('Q3_csv_input.csv') as csv_file:
                     data = []
@@ -45,6 +49,7 @@ if __name__ == '__main__':
                 # printing the output
                 print(pandas.read_csv('Q3_csv_output.csv'))
 
+            # end of program
             elif user_input == -1:
                 break
             else:
