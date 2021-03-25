@@ -1,5 +1,6 @@
 import socket
 import csv
+import pandas
 
 if __name__ == '__main__':
     while True:
@@ -34,21 +35,15 @@ if __name__ == '__main__':
                             data.append(row_list)
 
                 # writing to Q3_csv_output.csv
-                with open('Q3_csv_output.csv', mode='w') as output_file:
+                with open('Q3_csv_output.csv', mode='w', newline="") as output_file:
                     csv_writer = csv.writer(output_file, delimiter=',')
                     csv_writer.writerow(['hostname', 'A record'])
                     for d in data:
-                        if d:
+                        if any(d):
                             csv_writer.writerow(d)
 
                 # printing the output
-                with open('Q3_csv_output.csv') as csv_file:
-                    csv_reader = csv.reader(csv_file, delimiter=',')
-                    line_count = 0
-                    for row in csv_reader:
-                        for col in range(len(row)):
-                            print(row[col], end='\t')
-                        print()
+                print(pandas.read_csv('Q3_csv_output.csv'))
 
             elif user_input == -1:
                 break
