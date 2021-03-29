@@ -6,7 +6,7 @@ import pandas
 def write_on_csv(file_name):
     with open(file_name, mode='w', newline="") as output_file:
         csv_writer = csv.writer(output_file, delimiter=',')
-        csv_writer.writerow(['hostname', 'IP Address'])
+        csv_writer.writerow(['HOSTNAME', 'IPv4 ADDRESS'])
         for d in data:
             if any(d):
                 csv_writer.writerow(d)
@@ -54,7 +54,7 @@ if __name__ == '__main__':
                                 print('   >>> ({}/{}) : {} '.format(line_count, lines, hostname))
                                 row_list.append(hostname)
                                 host_info = socket.gethostbyaddr(hostname)
-                                # print(A_record)
+                                # print(host_info)
 
                                 row_list.append(host_info[2][0])
                                 line_count += 1
