@@ -442,7 +442,8 @@ if __name__ == '__main__':
             # entering a hostname
             if user_input == 1:
                 url = input(">>> Enter a URL: ")
-                message = build_message("A", url)
+                record = input(">>> Enter a Record Type: ")
+                message = build_message(record, url)
                 print("Request:")
                 print_message(message)
                 print("\nRequest (decoded):" + decode_message(message))
