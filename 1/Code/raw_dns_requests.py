@@ -89,7 +89,7 @@ def build_message(type="A", address=""):
 
 def decode_message(message):
     res = []
-    # res = {}
+    dic = {}
     # Header
     '''
                                         1  1  1  1  1  1
@@ -261,14 +261,19 @@ def decode_message(message):
     QCLASS = message[QCLASS_STARTS:QCLASS_STARTS + 4]
 
     res.append("\n HEADER")
+    dic.update({"ID": ID})
     res.append("    ID: " + ID)
     res.append("    QUERYPARAMS: ")
     for qp in QPARAMS:
-        res.append("       " + qp + ": " + QPARAMS[qp])
+        res.append("       " + qp + " : " + QPARAMS[qp])
+        dic.update({qp: QPARAMS[qp]})
     res.append("\n QUESTION SECTION")
     res.append("    QNAME  : " + QNAME)
     res.append("    QTYPE  : " + QTYPE + " (\"" + get_type(int(QTYPE, 16)) + "\")")
     res.append("    QCLASS : " + QCLASS)
+    dic.update({"QNAME": QNAME})
+    dic.update({"QTYPE": QTYPE})
+    dic.update({"QCLASS": QCLASS})
 
     # Answer section
     ANSWER_SECTION_STARTS = QCLASS_STARTS + 4
@@ -362,9 +367,22 @@ def decode_message(message):
                 res.append("       TTL      : " + str(TTL))
                 res.append("       RDLENGTH : " + str(RDLENGTH))
                 res.append("       RDDATA   : " + RDDATA + " ( " + RDDATA_decoded + " )\n")
+
+                dic.update({"QDCOUNT": QDCOUNT})
+                dic.update({"ANCOUNT": ANCOUNT})
+                dic.update({"NSCOUNT": NSCOUNT})
+                dic.update({"ARCOUNT": ARCOUNT})
+                dic.update({"ANAME": ANAME})
+                dic.update({"ATYPE": ATYPE})
+                dic.update({"ACLASS": ACLASS})
+                dic.update({"TTL": TTL})
+                dic.update({"RDLENGTH": RDLENGTH})
+                dic.update({"RDDATA": RDDATA})
+                dic.update({"RDDATA_decoded": RDDATA_decoded})
+
                 # res.append("       RDDATA decoded (result): " + RDDATA_decoded + "\n")
 
-    return "\n".join(res)
+    return "\n".join(res), dic
 
 
 def get_type(type):
@@ -446,13 +464,13 @@ if __name__ == '__main__':
                 message = build_message(record, url)
                 print("Request:")
                 print_message(message)
-                print("\nRequest (decoded):" + decode_message(message))
+                print("\nRequest (decoded):" + decode_message(message)[0])
 
                 # second argument is external DNS server, third argument is port
                 response = send_udp_message(message, "1.1.1.1", 53)
                 print("\nResponse:")
                 print_message(response)
-                print("\nResponse (decoded):" + decode_message(response))
+                print("\nResponse (decoded):" + decode_message(response)[0])
 
             # importing from a csv file
             elif user_input == 2:
