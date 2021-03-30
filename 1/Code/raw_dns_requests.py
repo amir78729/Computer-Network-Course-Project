@@ -10,12 +10,7 @@ import pandas
 # See https://tools.ietf.org/html/rfc1035
 
 def write_on_csv(file_name):
-    with open(file_name, mode='w', newline="") as output_file:
-        csv_writer = csv.writer(output_file, delimiter=',')
-        csv_writer.writerow(['HOSTNAME', 'IPv4 ADDRESS'])
-        for d in data:
-            if any(d):
-                csv_writer.writerow(d)
+    pass
 
 
 def send_udp_message(message, address, port):
@@ -90,6 +85,21 @@ def build_message(type="A", address=""):
 def decode_message(message):
     res = []
     dic = {}
+    dic.update({"ID": "???"})
+    dic.update({"QNAME": "???"})
+    dic.update({"QTYPE": "???"})
+    dic.update({"QCLASS": "???"})
+    dic.update({"QDCOUNT": "???"})
+    dic.update({"ANCOUNT": "???"})
+    dic.update({"NSCOUNT": "???"})
+    dic.update({"ARCOUNT": "???"})
+    dic.update({"ANAME": "???"})
+    dic.update({"ATYPE": "???"})
+    dic.update({"ACLASS": "???"})
+    dic.update({"TTL": "???"})
+    dic.update({"RDLENGTH": "???"})
+    dic.update({"RDDATA": "???"})
+    dic.update({"RDDATA_decoded": "???"})
     # Header
     '''
                                         1  1  1  1  1  1
@@ -251,22 +261,25 @@ def decode_message(message):
     '''
     QUESTION_SECTION_STARTS = 24
     question_parts = parse_parts(message, QUESTION_SECTION_STARTS, [])
-
-    QNAME = ".".join(map(lambda p: binascii.unhexlify(p).decode(), question_parts))
-
-    QTYPE_STARTS = QUESTION_SECTION_STARTS + (len("".join(question_parts))) + (len(question_parts) * 2) + 2
-    QCLASS_STARTS = QTYPE_STARTS + 4
-
-    QTYPE = message[QTYPE_STARTS:QCLASS_STARTS]
-    QCLASS = message[QCLASS_STARTS:QCLASS_STARTS + 4]
+    try:
+        QNAME = ".".join(map(lambda p: binascii.unhexlify(p).decode(), question_parts))
+        QTYPE_STARTS = QUESTION_SECTION_STARTS + (len("".join(question_parts))) + (len(question_parts) * 2) + 2
+        QCLASS_STARTS = QTYPE_STARTS + 4
+        QTYPE = message[QTYPE_STARTS:QCLASS_STARTS]
+        QCLASS = message[QCLASS_STARTS:QCLASS_STARTS + 4]
+    except:
+        pass
 
     res.append("\n HEADER")
-    dic.update({"ID": ID})
-    res.append("    ID: " + ID)
-    res.append("    QUERYPARAMS: ")
-    for qp in QPARAMS:
-        res.append("       " + qp + " : " + QPARAMS[qp])
-        dic.update({qp: QPARAMS[qp]})
+    try:
+        dic.update({"ID": ID})
+        res.append("    ID: " + ID)
+        res.append("    QUERYPARAMS: ")
+        for qp in QPARAMS:
+            res.append("       " + qp + " : " + QPARAMS[qp])
+            dic.update({qp: QPARAMS[qp]})
+    except:
+        pass
     res.append("\n QUESTION SECTION")
     res.append("    QNAME  : " + QNAME)
     res.append("    QTYPE  : " + QTYPE + " (\"" + get_type(int(QTYPE, 16)) + "\")")
@@ -424,23 +437,6 @@ def parse_parts(message, start, parts):
     else:
         return parse_parts(message, part_end, parts)
 
-
-# Usage: python3 raw-dns-req.py github.com
-
-# if len(sys.argv) > 1:
-#     url = sys.argv[1]
-# else:
-#     url = "google.com"
-
-# See get_type function for other possibilities for first argument
-# message = build_message("A", url)
-# print("Request:\n" + message)
-# print("\nRequest (decoded):" + decode_message(message))
-#
-# # second argument is external DNS server, third argument is port
-# response = send_udp_message(message, "1.1.1.1", 53)
-# print("\nResponse:\n" + response)
-# print("\nResponse (decoded):" + decode_message(response))
 def print_message(message):
     n = 4
     split_strings = [message[index: index + n] for index in range(0, len(message), n)]
@@ -474,7 +470,7 @@ if __name__ == '__main__':
 
             # importing from a csv file
             elif user_input == 2:
-
+                records = ['HOSTNAME', 'A', 'TXT', 'MX']
                 # counting lines
                 with open('Q3_csv_input.csv') as csv_file:
                     csv_reader = csv.reader(csv_file, delimiter=',')
@@ -496,14 +492,29 @@ if __name__ == '__main__':
                                 line_count += 1
                             else:
                                 hostname = row[0]
-                                print('   >>> ({}/{}) : {} '.format(line_count, lines, hostname))
+                                print('   >>> ({}/{}) : {} '.format(line_count, lines, hostname), end="")
                                 row_list.append(hostname)
-                                host_info = socket.gethostbyaddr(hostname)
+                                # host_info = socket.gethostbyaddr(hostname)
                                 # print(host_info)
-
-                                row_list.append(host_info[2][0])
+                                for r in records:
+                                    if r != 'HOSTNAME':
+                                        print("\t", r, end=': ')
+                                        try:
+                                            message = build_message(r, hostname)
+                                            # second argument is external DNS server, third argument is port
+                                            response = send_udp_message(message, "1.1.1.1", 53)
+                                            row_list.append(decode_message(response)[1].get("RDDATA_decoded"))
+                                            if decode_message(response)[1].get("RDDATA_decoded") != '???':
+                                                print('DONE  ', end='\t')
+                                            else :
+                                                print('FAILED', end='\t')
+                                        except:
+                                            row_list.append("???")
+                                            print('FAILED', end='\t')
+                                            pass
                                 line_count += 1
                                 data.append(row_list)
+                                print()
                         except IndexError:
                             line_count += 1
                         except socket.herror:
@@ -513,11 +524,23 @@ if __name__ == '__main__':
                             line_count += 1
                     print()
                 # writing to Q3_csv_output.csv
-                write_on_csv('Q3_csv_output.csv')
+                # write_on_csv('Q3_csv_output.csv')
+
+                print(data)
+
+                with open('Q3_csv_output.csv', mode='w', newline="", encoding="utf-8") as output_file:
+                    csv_writer = csv.writer(output_file, delimiter=',')
+                    csv_writer.writerow(records)
+                    for d in data:
+                        if any(d):
+                            csv_writer.writerow(d)
 
                 # printing the output
                 print('>>> Output')
-                print(pandas.read_csv('Q3_csv_output.csv'))
+                df = pandas.read_csv('Q3_csv_output.csv', index_col="HOSTNAME")
+                print(df)
+                df.head(10)
+                df.describe()
 
             # end of program
             elif user_input == -1:
