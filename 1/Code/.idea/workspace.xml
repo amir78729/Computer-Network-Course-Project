@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="070e233f-0967-4217-b992-c247e9df9ebe" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Q3_csv_input.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Q3_csv_input.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/workspace.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Q3_csv_output.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Q3_csv_output.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/raw_dns_requests.py" beforeDir="false" afterPath="$PROJECT_DIR$/raw_dns_requests.py" afterDir="false" />
     </list>
@@ -31,20 +31,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Q2_socket_client.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
+            <state relative-caret-position="356">
               <caret line="22" selection-start-line="22" selection-end-line="22" selection-end-column="47" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Q3_DNS_queries.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51">
-              <caret line="7" column="39" selection-start-line="7" selection-start-column="39" selection-end-line="7" selection-end-column="39" />
-              <folding>
-                <element signature="e#0#13#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -52,8 +40,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/raw_dns_requests.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="294">
-              <caret line="472" column="49" selection-start-line="472" selection-start-column="49" selection-end-line="472" selection-end-column="49" />
+            <state relative-caret-position="29">
+              <caret line="539" lean-forward="true" selection-start-line="539" selection-end-line="539" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -105,8 +93,8 @@
       <find>&gt;&gt;&gt;</find>
       <find>get_type</find>
       <find>dic.update</find>
-      <find>TXT</find>
       <find>,</find>
+      <find>TXT</find>
     </findStrings>
     <replaceStrings>
       <replace>53</replace>
@@ -125,8 +113,8 @@
         <option value="$PROJECT_DIR$/Q2_socket_client.py" />
         <option value="$PROJECT_DIR$/Q3_csv_output.csv" />
         <option value="$PROJECT_DIR$/Q3_DNS_queries.py" />
-        <option value="$PROJECT_DIR$/raw_dns_requests.py" />
         <option value="$PROJECT_DIR$/Q3_csv_input.csv" />
+        <option value="$PROJECT_DIR$/raw_dns_requests.py" />
       </list>
     </option>
   </component>
@@ -288,22 +276,22 @@
       <workItem from="1616628107005" duration="13157000" />
       <workItem from="1616782238121" duration="2146000" />
       <workItem from="1617005028265" duration="10956000" />
-      <workItem from="1617088695750" duration="7311000" />
+      <workItem from="1617088695750" duration="10778000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="43842000" />
+    <option name="totallyTimeSpent" value="47309000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18593371" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.13581245" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.12411348" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.79787236" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -318,7 +306,7 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="SciView" order="3" />
-      <window_info anchor="right" id="Database" order="4" />
+      <window_info anchor="right" id="Database" order="4" visible="true" weight="0.024252223" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -326,32 +314,15 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Code$socket_client.coverage" NAME="socket_client Coverage Results" MODIFIED="1616622259669" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Code$raw_dns_requests.coverage" NAME="raw_dns_requests Coverage Results" MODIFIED="1617142514173" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Code$raw_dns_requests.coverage" NAME="raw_dns_requests Coverage Results" MODIFIED="1617192207566" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Code$socket_server.coverage" NAME="socket_server Coverage Results" MODIFIED="1616617814237" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Code$Q3_DNS_queries.coverage" NAME="Q3_DNS_queries Coverage Results" MODIFIED="1616784148115" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Q2_socket_client.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="22" selection-start-line="22" selection-end-line="22" selection-end-column="47" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Q2_socket_server.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="527">
           <caret line="31" column="31" selection-start-line="31" selection-start-column="31" selection-end-line="31" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Q3_DNS_queries.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="7" column="39" selection-start-line="7" selection-start-column="39" selection-end-line="7" selection-end-column="39" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -369,10 +340,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Q3_DNS_queries.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="7" column="39" selection-start-line="7" selection-start-column="39" selection-end-line="7" selection-end-column="39" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Q2_socket_client.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="356">
+          <caret line="22" selection-start-line="22" selection-end-line="22" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/raw_dns_requests.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="294">
-          <caret line="472" column="49" selection-start-line="472" selection-start-column="49" selection-end-line="472" selection-end-column="49" />
+        <state relative-caret-position="29">
+          <caret line="539" lean-forward="true" selection-start-line="539" selection-end-line="539" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>

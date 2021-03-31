@@ -1,8 +1,8 @@
-HOSTNAME,A,TXT,MX
-google.com,142.250.185.174,docusign=05958488-4752-4ef2-95eb-aa7ba8a3bd0e,.alt3À*
-amazon.com,176.32.103.205,???,.amaz.n-smtpÀ
-twitter.com,10.10.34.35,10.10.34.35,10.10.34.35
-discord.com,162.159.128.233,???,.aspmx3À{
-samsung.com,211.45.27.231,v=spf1 include:_spf.samsung.com ~all,.mailinÀ
-aut.ac.ir,185.211.88.131,v=spf1 a mx ip4:185.211.88.20 ip4:185.211.88.9 ip4:194.225.34.16/28 ip4:194.225.33.10 -all,.asgÀ.
-spotify.com,35.186.224.25,???,.aspmx5À{
+HOSTNAME,A,TXT
+google.com,142.250.185.174,???
+amazon.com,176.32.103.205,???
+twitter.com,10.10.34.35,10.10.34.35
+discord.com,162.159.135.232,???
+samsung.com,???,???
+aut.ac.ir,???,???
+spotify.com,35.186.224.25,???

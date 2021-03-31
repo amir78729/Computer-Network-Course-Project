@@ -9,9 +9,6 @@ import pandas
 # See https://routley.io/tech/2017/12/28/hand-writing-dns-messages.html
 # See https://tools.ietf.org/html/rfc1035
 
-def write_on_csv(file_name):
-    pass
-
 
 def send_udp_message(message, address, port):
     """send_udp_message sends a message to UDP server
@@ -22,21 +19,21 @@ def send_udp_message(message, address, port):
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        sock.sendto(binascii.unhexlify(message), server_address)
+        sock.sendto(binascii.unhexlify(message), (address, port))
         data, _ = sock.recvfrom(4096)
     finally:
         sock.close()
     return binascii.hexlify(data).decode("utf-8")
 
 
-def build_message(type="A", address=""):
+def build_message(type="A", address="", r="1"):
     ID = 43690  # 16-bit identifier (0-65535) # 43690 equals 'aaaa'
 
     QR     = 0  # Query: 0, Response: 1     1bit
     OPCODE = 0  # Standard query            4bit
     AA     = 0  # ?                         1bit
     TC     = 0  # Message is truncated?     1bit
-    RD     = 1  # Recursion?                1bit
+    RD     = r  # RECURSION?                1bit
     RA     = 0  # ?                         1bit
     Z      = 0  # ?                         3bit
     RCODE  = 0  # ?                         4bit
@@ -457,7 +454,14 @@ if __name__ == '__main__':
             if user_input == 1:
                 url = input(">>> Enter a URL: ")
                 record = input(">>> Enter a Record Type: ")
-                message = build_message(record, url)
+                while True:
+                    recursion = int(input(">>> Recursive Queries(1) or Iterative Queries?(0)"))
+                    if recursion == 1 or recursion == 0:
+                        break
+                    else:
+                        print('   >>> You Have to enter 0 or 1! Try again...')
+
+                message = build_message(record, url, recursion)
                 print("Request:")
                 print_message(message)
                 print("\nRequest (decoded):" + decode_message(message)[0])
@@ -470,7 +474,13 @@ if __name__ == '__main__':
 
             # importing from a csv file
             elif user_input == 2:
-                records = ['HOSTNAME', 'A', 'TXT', 'MX']
+                while True:
+                    recursion = int(input(">>> Recursive Queries(1) or Iterative Queries?(0)"))
+                    if recursion == 1 or recursion == 0:
+                        break
+                    else:
+                        print('   >>> You Have to enter 0 or 1! Try again...')
+                records = ['HOSTNAME', 'A', 'TXT']
                 # counting lines
                 with open('Q3_csv_input.csv') as csv_file:
                     csv_reader = csv.reader(csv_file, delimiter=',')
@@ -500,7 +510,7 @@ if __name__ == '__main__':
                                     if r != 'HOSTNAME':
                                         print("\t", r, end=': ')
                                         try:
-                                            message = build_message(r, hostname)
+                                            message = build_message(r, hostname, recursion)
                                             # second argument is external DNS server, third argument is port
                                             response = send_udp_message(message, "1.1.1.1", 53)
                                             row_list.append(decode_message(response)[1].get("RDDATA_decoded"))
@@ -526,7 +536,7 @@ if __name__ == '__main__':
                 # writing to Q3_csv_output.csv
                 # write_on_csv('Q3_csv_output.csv')
 
-                print(data)
+                # print(data)
 
                 with open('Q3_csv_output.csv', mode='w', newline="", encoding="utf-8") as output_file:
                     csv_writer = csv.writer(output_file, delimiter=',')
