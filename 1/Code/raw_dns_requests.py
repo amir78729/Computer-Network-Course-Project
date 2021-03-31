@@ -1,6 +1,8 @@
 import binascii
 import socket
-import sys
+import sqlite3
+from sqlite3 import Error
+from caching import *
 from collections import OrderedDict
 import csv
 import pandas
@@ -442,18 +444,39 @@ def print_message(message):
 
 
 if __name__ == '__main__':
+    count = {}  # used in caching
+
+    database = r"C:\sqlite\db\pythonsqlite.db"
+    conn = create_connection(database)
+
+    dns_cache_table = """ CREATE TABLE IF NOT EXISTS dns_cache (
+                                            HOSTNAME text PRIMARY KEY,
+                                            RECORD text,
+                                            RECURSION text,
+                                            RESPONSE text
+                                        ); """
+
+    if conn is not None:
+        # create projects table
+        create_table(conn, dns_cache_table)
+
+    else:
+        print("Error... Caching is NOT active!.")
+
     while True:
-        print('-----------------------------')
+        print('-'*100)
         print("Select an Option\n"
               " 1 - Enter a Hostname\n"
-              " 2 - Import from CSV file\n"
+              " 2 - Import from CSV File\n"
+              " 3 - See Cache Data\n"
+              " 4 - Clear Cache\n"
               "-1 - Exit")
         try:
             user_input = int(input())
             # entering a hostname
             if user_input == 1:
                 url = input(">>> Enter a URL: ")
-                record = input(">>> Enter a Record Type: ")
+                record = input(">>> Enter a Record Type: ").upper()
                 while True:
                     recursion = int(input(">>> Recursive Queries(1) or Iterative Queries?(0)"))
                     if recursion == 1 or recursion == 0:
@@ -470,6 +493,7 @@ if __name__ == '__main__':
                 response = send_udp_message(message, "1.1.1.1", 53)
                 print("\nResponse:")
                 print_message(response)
+
                 print("\nResponse (decoded):" + decode_message(response)[0])
 
             # importing from a csv file
@@ -551,10 +575,19 @@ if __name__ == '__main__':
                 print(df)
                 df.head(10)
                 df.describe()
+                print('\nNOTE: Complete data can be seen in the CSV file, also in the CSV file there is only one of the'
+                      '\nanswers, To see all of them you can choose the 1st option in the main menu.\n')
 
             # end of program
             elif user_input == -1:
                 break
+            # see cache
+            elif user_input == 3:
+                pass
+            # clear cache
+            elif user_input == 4:
+                pass
+            # bad input
             else:
                 print('Something went wrong! Try again.')
         except (socket.gaierror, ValueError):
