@@ -446,13 +446,11 @@ def print_message(message):
 if __name__ == '__main__':
     count = {}  # used in caching
 
-    database = r"C:\sqlite\db\pythonsqlite.db"
+    database = "cache.db"
     conn = create_connection(database)
 
     dns_cache_table = """ CREATE TABLE IF NOT EXISTS dns_cache (
-                                            HOSTNAME text PRIMARY KEY,
-                                            RECORD text,
-                                            RECURSION text,
+                                            HOSTNAME_RECORD_RECURSION text PRIMARY KEY,
                                             RESPONSE text
                                         ); """
 
@@ -483,18 +481,38 @@ if __name__ == '__main__':
                         break
                     else:
                         print('   >>> You Have to enter 0 or 1! Try again...')
+                cache_string = url + '_' + record + '_' + str(recursion)
+                if check_if_exists(conn, cache_string):
+                    print('\n*** Data is in the cache!')
+                    response = get_response_from_cache(conn, cache_string)[0][0]
+                    print("\nResponse:")
+                    print_message(response)
+                    print("\nResponse (decoded):" + decode_message(response)[0])
 
-                message = build_message(record, url, recursion)
-                print("Request:")
-                print_message(message)
-                print("\nRequest (decoded):" + decode_message(message)[0])
+                else:
+                    print('\n*** Data is not in the cache!')
+                    # if this is the 1st time that user has entered this request...
+                    if cache_string not in count.keys():
+                        count[cache_string] = 1
+                    # if the user has requested this before...
+                    else:
+                        count.update({cache_string: count[cache_string] + 1})
 
-                # second argument is external DNS server, third argument is port
-                response = send_udp_message(message, "1.1.1.1", 53)
-                print("\nResponse:")
-                print_message(response)
+                    print(count)
+                    message = build_message(record, url, recursion)
+                    print("Request:")
+                    print_message(message)
+                    print("\nRequest (decoded):" + decode_message(message)[0])
 
-                print("\nResponse (decoded):" + decode_message(response)[0])
+                    # second argument is external DNS server, third argument is port
+                    response = send_udp_message(message, "1.1.1.1", 53)
+                    print("\nResponse:")
+                    print_message(response)
+                    print("\nResponse (decoded):" + decode_message(response)[0])
+
+                    if count[cache_string] == 3:
+                        print('*** ADDING THIS REQUEST TO THE CACHE!')
+                        add_new_data(conn, (cache_string, response))
 
             # importing from a csv file
             elif user_input == 2:
@@ -583,10 +601,30 @@ if __name__ == '__main__':
                 break
             # see cache
             elif user_input == 3:
-                pass
+                cache_data = get_cache(conn)
+                if len(cache_data) != 0:
+                    i = 1
+                    for data in cache_data:
+                        # print(data[0].split('_'))
+                        d_hostname, d_record, d_recursion_bit = data[0].split('_')
+
+                        if d_recursion_bit == 0:
+                            d_recursion = 'iterative'
+                        else:
+                            d_recursion = 'recursive'
+                        # print(d_hostname, d_record, d_recursion_bit, d_recursion)
+                        print('{})\t{} ({} record with RD={}) :\n\t{}\n\t({})\n'.format(i, d_hostname, d_record,
+                                                                                        d_recursion_bit, data[1],
+                                                                                        decode_message(data[1])[1]
+                                                                                        ['RDDATA_decoded']))
+                        i += 1
+                else:
+                    print('The Cache is Empty')
             # clear cache
             elif user_input == 4:
-                pass
+                clear_cache(conn)
+                print('*** The Cache is Empty')
+
             # bad input
             else:
                 print('Something went wrong! Try again.')
