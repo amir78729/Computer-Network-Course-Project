@@ -1,8 +1,0 @@
-HOSTNAME,A,TXT
-google.com,142.250.186.110,???
-amazon.com,54.239.28.85,???
-twitter.com,10.10.34.35,10.10.34.35
-discord.com,162.159.135.232,???
-samsung.com,211.45.27.231,v=spf1 include:_spf.samsung.com ~all
-aut.ac.ir,185.211.88.131,v=spf1 a mx ip4:185.211.88.20 ip4:185.211.88.9 ip4:194.225.34.16/28 ip4:194.225.33.10 -all
-spotify.com,35.186.224.25,???
