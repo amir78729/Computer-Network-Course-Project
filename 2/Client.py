@@ -14,10 +14,16 @@ if __name__ == '__main__':
 
     option = int(input(' 1 - login\n 2 - create new account\n-1 - cancel'.upper()))
     if option == 1:
-        print('login:')
+        print('login:'.upper())
         username = input(' > username:  '.upper())
         password = input(' > password:  '.upper())
         msg = 'login {} {}'.format(username, password)
+        s.send(msg.encode('utf-8'))
+    elif option == 2:
+        print('new account:'.upper())
+        username = input(' > username:  '.upper())
+        password = input(' > password:  '.upper())
+        msg = 'signup {} {}'.format(username, password)
         s.send(msg.encode('utf-8'))
 
     # receive data from the server

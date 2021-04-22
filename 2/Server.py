@@ -3,7 +3,7 @@ import socket
 
 class Server:
     def __init__(self):
-        self.users = []
+        self.users = {}
 
     def run_server(self):
         # next create a socket object
@@ -37,12 +37,23 @@ class Server:
 
             # send a thank you message to the client.
             # c.send(b'Thank you for connecting')
-            recieved_message = c.recv(2048).decode('utf-8').split()
-            if recieved_message[0] == 'login':
-                if recieved_message[1] in self.users :
-                    c.send('user is in the list'.upper().encode('utf-8'))
+            received_message = c.recv(2048).decode('utf-8').split()
+            if received_message[0] == 'login':
+                if received_message[1] in self.users.keys():
+                    # c.send('user is in the list'.upper().encode('utf-8'))
+                    if self.users[received_message[1]] == received_message[2]:
+                        c.send('logged in successfully'.upper().encode('utf-8'))
+                    else:
+                        c.send('wrong password!'.upper().encode('utf-8'))
                 else:
                     c.send('user does not exist'.upper().encode('utf-8'))
+
+            if received_message[0] == 'signup':
+                if received_message[1] in self.users.keys():
+                    c.send('user already exists!'.upper().encode('utf-8'))
+                else:
+                    self.users.update({received_message[1]: received_message[2]})
+                    c.send('user created successfully'.upper().encode('utf-8'))
 
 
 
