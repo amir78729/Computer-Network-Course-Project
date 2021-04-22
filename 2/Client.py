@@ -3,7 +3,6 @@ import socket
 import getpass
 
 
-
 if __name__ == '__main__':
     # Create a socket object
     s = socket.socket()
@@ -12,7 +11,9 @@ if __name__ == '__main__':
     # connect to the server on local computer
     s.connect(('127.0.0.1', port))
 
-    option = int(input(' 1 - login\n 2 - create new account\n-1 - cancel'.upper()))
+    option = int(input(' 1 - login\n'
+                       ' 2 - create new account\n'
+                       '-1 - cancel\n'.upper()))
     if option == 1:
         print('login:'.upper())
         username = input(' > username:  '.upper())
@@ -25,8 +26,11 @@ if __name__ == '__main__':
         password = input(' > password:  '.upper())
         msg = 'signup {} {}'.format(username, password)
         s.send(msg.encode('utf-8'))
+    elif option == -1:
+        print('canceled'.upper)
 
     # receive data from the server
-    print(s.recv(1024))
+    received_message = s.recv(2048).decode('utf-8')
+    print(received_message)
     # close the connection
     s.close()
