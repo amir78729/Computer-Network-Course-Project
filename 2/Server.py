@@ -1,12 +1,26 @@
 # first of all import the socket library 
 import socket
 import datetime
-import pytz
+import csv
 
 
 class Server:
     def __init__(self):
-        self.users = {}
+        # retrieve users to a dictionary from a csv file
+        with open('users.csv', mode='r') as infile:
+            reader = csv.reader(infile)
+            self.users = {rows[0]: rows[1] for rows in reader}
+
+    def add_user(self, username, password):
+        # add user to dictionary
+        self.users.update({username: password})
+        # add user to 'users.csv'
+        with open('users.csv', 'a+') as write_obj:
+            csv_writer = csv.writer(write_obj)
+            csv_writer.writerow([username, password])
+
+    def send_message_to_client(self, c, message):
+        c.send(message.upper().encode('utf-8'))
 
     def run_server(self):
         # next create a socket object
@@ -26,20 +40,24 @@ class Server:
         # print("socket binded to %s" % (port))
 
         # put the socket into listening mode
-        s.listen(5)
+        s.listen(15)
         # print("socket is listening")
 
         # a forever loop until we interrupt it or
         # an error occurs
         while True:
             print('- '*20)
+            print(self.users)
+
             # Establish connection with client.
             print('{} users are connected to the server'.format(len(self.users)).upper())
+
+            print('waiting for clients...'.upper(), end='')
             c, addr = s.accept()
 
-            # send a thank you message to the client.
-            # c.send(b'Thank you for connecting')
             try:
+                # print('waiting for clients...'.upper(), end='')
+                # c, addr = s.accept()
                 received_message = c.recv(2048).decode('utf-8').split()
 
                 print('new connection!'
@@ -64,12 +82,13 @@ class Server:
                         c.send('user already exists!'.upper().encode('utf-8'))
                         print('\tstatus  :\tuser already exist!'.upper())
                     else:
-                        self.users.update({received_message[1]: received_message[2]})
+                        self.add_user(received_message[1], received_message[2])
                         c.send('user created successfully'.upper().encode('utf-8'))
                         print('\tstatus  :\tsuccessful'.upper())
-            except:
-                print('oops...something went wrong!'.upper())
-                c.send('oops...something went wrong!'.upper().encode('utf-8'))
+            except Exception as e:
+                print('oops...something went wrong:'.upper())
+                print(e)
+                c.send('oops, something went wrong!'.upper().encode('utf-8'))
             # Close the connection with the client
         # c.close()
 
