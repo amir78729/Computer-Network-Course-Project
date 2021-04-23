@@ -55,6 +55,7 @@ def get_table(conn, table):
     """
     Query all rows in the tasks table
     :param conn: the Connection object
+    :param table: table name
     :return:
     """
     cur = conn.cursor()
@@ -64,7 +65,7 @@ def get_table(conn, table):
 
 def check_password(conn, username, password):
     """
-
+    check if a username's real password is as same as input password.
     :param conn:
     :param username:
     :param password:
@@ -75,6 +76,12 @@ def check_password(conn, username, password):
     result = cur.fetchall()
     # print(result[0][1] == password)
     return result[0][1] == password
+
+def delete_user_from_database(conn, username):
+    cur = conn.cursor()
+    cur.execute("DELETE FROM users_info WHERE username=\'{}\'".format(username))
+    conn.commit()
+
 
 def check_if_user_exists(conn, username):
     """

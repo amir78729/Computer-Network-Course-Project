@@ -27,6 +27,10 @@ class Server:
         else:
             print("Error... Database is NOT active!.")
 
+    def print_server_info(self):
+        print('server info'.upper())
+        print('\tusers count: {}'.format(len(get_table(self.conn, 'users_info'))).upper())
+
     def add_user(self, username, password):
         # add user to dictionary
         # self.users.update({username: password})
@@ -40,7 +44,12 @@ class Server:
     def send_message_to_client(self, c, message):
         c.send(message.upper().encode('utf-8'))
 
+    def delete_user(self, username):
+        delete_user_from_database(self.conn, username)
+
+    # TODO: a single user cannot send message to server. I don'r know where the problem is
     def run_server(self):
+        delete_user_from_database(self.conn, 'amir')
         # next create a socket object
         s = socket.socket()
         port = 12345
@@ -54,10 +63,9 @@ class Server:
         s.listen(15)
 
         while True:
-            print(get_table(self.conn, 'users_info'))
+            print('- ' * 20)
 
-
-            print('- '*20)
+            self.print_server_info()
             # print(self.users)
 
             # Establish connection with client.
@@ -70,17 +78,20 @@ class Server:
                 # print('waiting for clients...'.upper(), end='')
                 # c, addr = s.accept()
                 received_message = c.recv(2048).decode('utf-8').split()
+                command = received_message[0]
 
                 print('new connection!'
                       '\n\ttype    :\t{}'
                       '\n\tfrom    :\t{}:{}'
-                      '\n\tat      :\t{}'.format(received_message[0], addr[0], addr[1], datetime.datetime.now().strftime("%c")).upper())
+                      '\n\tat      :\t{}'.format(command, addr[0], addr[1], datetime.datetime.now().strftime("%c")).upper())
 
-                if received_message[0] == 'login':
+                if command == 'login':
                     # if received_message[1] in self.users.keys():
-                    if check_if_user_exists(self.conn, received_message[1]):
+                    username, password = received_message[1], received_message[2]
+
+                    if check_if_user_exists(self.conn, username):
                         # if self.users[received_message[1]] == received_message[2]:
-                        if check_password(self.conn, received_message[1], received_message[2]):
+                        if check_password(self.conn, username, password):
                             # c.send('logged in successfully'.upper().encode('utf-8'))
                             self.send_message_to_client(c, 'logged in successfully')
                             print('\tstatus  :\tsuccessful'.upper())
@@ -93,17 +104,26 @@ class Server:
                         self.send_message_to_client(c, 'user does not exist')
                         print('\tstatus  :\tuser not found'.upper())
 
-                if received_message[0] == 'signup':
+                if command == 'signup':
                     # if received_message[1] in self.users.keys():
-                    if check_if_user_exists(self.conn, received_message[1]):
+                    username, password = received_message[1], received_message[2]
+
+                    if check_if_user_exists(self.conn, username):
                         # c.send('user already exists!'.upper().encode('utf-8'))
                         self.send_message_to_client(c, 'user already exists!')
                         print('\tstatus  :\tuser already exist!'.upper())
                     else:
-                        self.add_user(received_message[1], received_message[2])
+                        self.add_user(username, password)
                         # c.send('user created successfully'.upper().encode('utf-8'))
                         self.send_message_to_client(c, 'user created successfully')
                         print('\tstatus  :\tsuccessful'.upper())
+
+                if command == 'delete-user':
+                    username = received_message[1]
+                    self.delete_user(username)
+                    self.send_message_to_client(c, 'user deleted successfully')
+                    print('\tstatus  :\tsuccessful'.upper())
+
             except Exception as e:
                 print('oops...something went wrong:'.upper())
                 print(e)
