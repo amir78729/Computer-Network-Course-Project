@@ -18,7 +18,7 @@ class Server:
         self.ROOT_PATH = 'GIT'
         self.WORKING_DIRECTORY = os.getcwd()
         make_directory(self.ROOT_PATH, self.WORKING_DIRECTORY)
-        self.WORKING_DIRECTORY = os.path.join(self.conn_user_password, self.ROOT_PATH)
+        self.WORKING_DIRECTORY = os.path.join(self.WORKING_DIRECTORY, self.ROOT_PATH)
 
 
         # connecting to the database
@@ -44,9 +44,6 @@ class Server:
             create_table(self.conn_user_info, create_user_table_query)
         else:
             print("Error... Database is NOT active!")
-
-
-
 
     def print_server_info(self):
         print('server info'.upper())
@@ -130,11 +127,29 @@ class Server:
                 self.delete_user(username)
                 self.send_message_to_client(c, 'user deleted successfully')
                 print('\tstatus  :\tsuccessful'.upper())
+                self.active_users.remove(username)
                 remove_directory(username, self.WORKING_DIRECTORY)
+
+            elif command == 'create-repo':
+                username = received_message[1]
+                repository_name = received_message[2]
+                parent_directory = os.path.join(self.WORKING_DIRECTORY, username)
+                make_directory(repository_name, parent_directory)
+                print('\tstatus  :\tREPOSITORY \"{}\" CREATED FOR USER \"{}\"'.format(repository_name, username))
+                self.send_message_to_client(c, 'repository created successfully')
+
+            elif command == 'show-repo':
+                username = received_message[1]
+                repositories = os.listdir(os.path.join(self.WORKING_DIRECTORY, username))
+                self.send_message_to_client(c, str(len(repositories)))
+                for repo in repositories:
+                    self.send_message_to_client(c, '\t- '+repo)
 
 
             # disconnecting
             elif command == 'disconnect':
+                username = received_message[1]
+                self.active_users.remove(username)
                 connected = False
 
             else:
