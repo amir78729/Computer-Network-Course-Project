@@ -1,136 +1,165 @@
-# first of all import the socket library 
 import socket
 import datetime
-import csv
 from database_functions import *
+from _thread import *
+# import os
+from directiry_management_functions import *
+import threading
 
 
 class Server:
     def __init__(self):
-        # retrieve users to a dictionary from a csv file
-        # with open('users.csv', mode='r') as infile:
-        #     reader = csv.reader(infile)
-        #     self.users = {rows[0]: rows[1] for rows in reader}
 
-        git_database = "users.db"
-        self.conn = create_connection(git_database)
+        self.PORT = 12345
+        self.ADDRESS = socket.gethostbyname(socket.gethostname())
+        self.MESSAGE_SIZE_LENGTH = 64
+        self.ENCODING = 'utf-8'
+        self.active_users = []
+        self.ROOT_PATH = 'GIT'
+        self.WORKING_DIRECTORY = os.getcwd()
+        make_directory(self.ROOT_PATH, self.WORKING_DIRECTORY)
+        self.WORKING_DIRECTORY = os.path.join(self.conn_user_password, self.ROOT_PATH)
 
-        create_user_table_query = """ CREATE TABLE IF NOT EXISTS users_info (
+
+        # connecting to the database
+        git_user_password_database = "user_password.sql"
+        self.conn_user_password = create_connection(git_user_password_database)
+        create_user_table_query = """ CREATE TABLE IF NOT EXISTS users_passwords (
                                                     username text PRIMARY KEY,
                                                     password text
                                                 ); """
-
-        if self.conn is not None:
-            # create projects table
-            create_table(self.conn, create_user_table_query)
-
+        if self.conn_user_password is not None:
+            create_table(self.conn_user_password, create_user_table_query)
         else:
-            print("Error... Database is NOT active!.")
+            print("Error... Database is NOT active!")
+
+        # connecting to the database
+        git_user_info_database = "user_info.sql"
+        self.conn_user_info = create_connection(git_user_info_database)
+        create_user_table_query = """ CREATE TABLE IF NOT EXISTS users_info (
+                                                        username text PRIMARY KEY,
+                                                        password text
+                                                    ); """
+        if self.conn_user_info is not None:
+            create_table(self.conn_user_info, create_user_table_query)
+        else:
+            print("Error... Database is NOT active!")
+
+
+
 
     def print_server_info(self):
         print('server info'.upper())
-        print('\tusers count: {}'.format(len(get_table(self.conn, 'users_info'))).upper())
+        print('\tnumber of users in database: {}'.format(len(get_table(self.conn_user_password, 'users_passwords'))).upper())
+        print('\tnumber of active users: {}'.format(len(self.active_users)).upper())
+        [print('\t\t- {}'.format(i)) for i in self.active_users]
 
     def add_user(self, username, password):
-        # add user to dictionary
-        # self.users.update({username: password})
-        # add user to 'users.csv'
-        # with open('users.csv', 'a+') as write_obj:
-        #     csv_writer = csv.writer(write_obj)
-        #     csv_writer.writerow([username, password])
+        insert_into_table(self.conn_user_password, 'users_passwords', 'username, password', (username, password))
 
-        insert_into_table(self.conn, 'users_info', 'username, password', (username, password))
-
-    def send_message_to_client(self, c, message):
-        c.send(message.upper().encode('utf-8'))
+    def send_message_to_client(self, c, msg):
+        # c.send(message.upper().encode('utf-8'))
+        message = msg.upper().encode(self.ENCODING)
+        message_length = len(message)
+        message_length = str(message_length).encode(self.ENCODING)
+        message_length += b' ' * (self.MESSAGE_SIZE_LENGTH - len(message_length))
+        c.send(message_length)
+        c.send(message)
 
     def delete_user(self, username):
-        delete_user_from_database(self.conn, username)
+        delete_user_from_database(self.conn_user_password, username)
 
     # TODO: a single user cannot send message to server. I don'r know where the problem is
-    def run_server(self):
-        delete_user_from_database(self.conn, 'amir')
-        # next create a socket object
-        s = socket.socket()
-        port = 12345
+    #  Maybe using threads is the solution
+    #  https://stackoverflow.com/questions/42222425/python-sockets-multiple-messages-on-same-connection
 
-        # Next bind to the port
-        # we have not typed any ip in the ip field
-        # instead we have inputted an empty string
-        # this makes the server listen to requests
-        # coming from other computers on the network
-        s.bind(('', port))
-        s.listen(15)
-
-        while True:
+    def handle_client(self, c, addr):
+        # c.send(str.encode('Server is working:'))
+        print('someone is connected!'.upper())
+        connected = True
+        while connected:
             print('- ' * 20)
-
             self.print_server_info()
-            # print(self.users)
+            print('waiting for clients...'.upper())
+            # try:
+            # print('waiting for clients...'.upper(), end='')
+            # c, addr = s.accept()
+            message_length = int(c.recv(self.MESSAGE_SIZE_LENGTH).decode(self.ENCODING))
+            received_message = c.recv(message_length).decode(self.ENCODING).split()
 
-            # Establish connection with client.
-            # print('{} users are connected to the server'.format(len(self.users)).upper())
+            command = received_message[0]
 
-            print('waiting for clients...'.upper(), end='')
-            c, addr = s.accept()
+            print('new connection!'
+                  '\n\ttype    :\t{}'
+                  '\n\tfrom    :\t{}:{}'
+                  '\n\tat      :\t{}'.format(command, addr[0], addr[1],
+                                             datetime.datetime.now().strftime("%c")).upper())
 
-            try:
-                # print('waiting for clients...'.upper(), end='')
-                # c, addr = s.accept()
-                received_message = c.recv(2048).decode('utf-8').split()
-                command = received_message[0]
+            if command == 'login':
+                # if received_message[1] in self.users.keys():
+                username, password = received_message[1], received_message[2]
 
-                print('new connection!'
-                      '\n\ttype    :\t{}'
-                      '\n\tfrom    :\t{}:{}'
-                      '\n\tat      :\t{}'.format(command, addr[0], addr[1], datetime.datetime.now().strftime("%c")).upper())
-
-                if command == 'login':
-                    # if received_message[1] in self.users.keys():
-                    username, password = received_message[1], received_message[2]
-
-                    if check_if_user_exists(self.conn, username):
-                        # if self.users[received_message[1]] == received_message[2]:
-                        if check_password(self.conn, username, password):
-                            # c.send('logged in successfully'.upper().encode('utf-8'))
-                            self.send_message_to_client(c, 'logged in successfully')
-                            print('\tstatus  :\tsuccessful'.upper())
-                        else:
-                            # c.send('wrong password!'.upper().encode('utf-8'))
-                            self.send_message_to_client(c, 'wrong password!')
-                            print('\tstatus  :\twrong password'.upper())
-                    else:
-                        # c.send('user does not exist'.upper().encode('utf-8'))
-                        self.send_message_to_client(c, 'user does not exist')
-                        print('\tstatus  :\tuser not found'.upper())
-
-                if command == 'signup':
-                    # if received_message[1] in self.users.keys():
-                    username, password = received_message[1], received_message[2]
-
-                    if check_if_user_exists(self.conn, username):
-                        # c.send('user already exists!'.upper().encode('utf-8'))
-                        self.send_message_to_client(c, 'user already exists!')
-                        print('\tstatus  :\tuser already exist!'.upper())
-                    else:
-                        self.add_user(username, password)
-                        # c.send('user created successfully'.upper().encode('utf-8'))
-                        self.send_message_to_client(c, 'user created successfully')
+                if check_if_user_exists(self.conn_user_password, username):
+                    # if self.users[received_message[1]] == received_message[2]:
+                    if check_password(self.conn_user_password, username, password):
+                        self.send_message_to_client(c, 'logged in successfully')
                         print('\tstatus  :\tsuccessful'.upper())
+                        self.active_users.append(username)
+                    else:
+                        self.send_message_to_client(c, 'wrong password!')
+                        print('\tstatus  :\twrong password'.upper())
+                else:
+                    self.send_message_to_client(c, 'user does not exist')
+                    print('\tstatus  :\tuser not found'.upper())
 
-                if command == 'delete-user':
-                    username = received_message[1]
-                    self.delete_user(username)
-                    self.send_message_to_client(c, 'user deleted successfully')
+            elif command == 'signup':
+                username, password = received_message[1], received_message[2]
+
+                if check_if_user_exists(self.conn_user_password, username):
+                    self.send_message_to_client(c, 'user already exists!')
+                    print('\tstatus  :\tuser already exist!'.upper())
+                else:
+                    self.add_user(username, password)
+                    self.send_message_to_client(c, 'user created successfully')
                     print('\tstatus  :\tsuccessful'.upper())
+                    self.active_users.append(username)
+                    make_directory(username, self.WORKING_DIRECTORY)
 
-            except Exception as e:
-                print('oops...something went wrong:'.upper())
-                print(e)
-                # c.send('oops, something went wrong!'.upper().encode('utf-8'))
-                self.send_message_to_client(c, 'oops, something went wrong!')
-            # Close the connection with the client
-        # c.close()
+            elif command == 'delete-user':
+                username = received_message[1]
+                self.delete_user(username)
+                self.send_message_to_client(c, 'user deleted successfully')
+                print('\tstatus  :\tsuccessful'.upper())
+                remove_directory(username, self.WORKING_DIRECTORY)
+
+
+            # disconnecting
+            elif command == 'disconnect':
+                connected = False
+
+            else:
+                print('bad input from client!'.upper())
+
+            # except Exception as e:
+            #     print('oops...something went wrong:'.upper())
+            #     print(e)
+            #     self.send_message_to_client(c, 'oops, something went wrong!')
+        print('- ' * 20)
+        self.print_server_info()
+        print('waiting for clients...'.upper())
+        c.close()
+
+    def run_server(self):
+        # delete_user_from_database(self.conn_user_password, 'amir')
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind((self.ADDRESS, self.PORT))
+        print('server is up...'.upper())
+        s.listen()
+        while True:
+            c, addr = s.accept()
+            th = threading.Thread(target=self.handle_client, args=(c, addr,))
+            th.start()
+
 
 
 if __name__ == '__main__':

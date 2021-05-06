@@ -127,14 +127,14 @@ def decode_message(message):
                 try:
                     ATYPE
                 except NameError:
-                    None
+                    pass
                 else:
                     print("\tANSWER Part : " + str(answer + 1))
                     print("\t\tRDDATA decoded: " + RDDATA_decoded + "\n")
         if int(NSCOUNT, 16) > 0:
             print("NSCOUNT:")
             for answer in range(int(NSCOUNT, 16)):
-                if (answer_start < len(message)):
+                if answer_start < len(message):
                     ATYPE = message[answer_start + 4:answer_start + 8]
                     RDLENGTH = int(message[answer_start + 20:answer_start + 24], 16)
                     RDDATA = message[answer_start + 24:answer_start + 24 + (RDLENGTH * 2)]
@@ -143,7 +143,7 @@ def decode_message(message):
                         ip = ""
                         for x in octets:
                             ip += str(int(x, 16))
-                            if (octets.index(x) != len(octets) - 1):
+                            if octets.index(x) != len(octets) - 1:
                                 ip += '.'
                         RDDATA_decoded = ip
                     else:
@@ -151,7 +151,7 @@ def decode_message(message):
                         arr = splitting(RDDATA, 0, [])
                         for x in arr:
                             string += binascii.unhexlify(x).decode('iso8859-1')
-                            if (arr.index(x) != len(arr) - 1):
+                            if arr.index(x) != len(arr) - 1:
                                 string += '.'
                         RDDATA_decoded = string
                     answer_start = answer_start + 24 + (RDLENGTH * 2)
@@ -250,9 +250,10 @@ def find_iterative(url):
     print_message(response)
     print("\nResponse (decoded):")
     servers, f = decode_message(response)
-    if f == True:
+    if f:  # answer found (ANCOUNT > 0)
         return
-    print(servers)
+    for server in servers:
+        print(server)
     while flag:
         print("Trying with {}".format(servers[0]))
         response = send_query(message, servers[0], 53)
@@ -260,10 +261,10 @@ def find_iterative(url):
         print_message(response)
         print("\nResponse (decoded):")
         x, d = decode_message(response)
-        if d == True:
+        if d:
             packet = binascii.unhexlify(response)
             d = dnslib.DNSRecord.parse(packet)
-            print(d)
+            print('THE ANSWER IS READY!')
             return d
         else:
             if not len(x) == 0:
@@ -277,8 +278,8 @@ def find_iterative(url):
                 d = dnslib.DNSRecord.parse(packet)
                 arr = str(d).split("\n")
                 for i in arr:
-                    if ("IN      NS" in i):
-                        print(i)
+                    if "IN      NS" in i:
+                        # print(i)
                         s = str(i).split(" ")
                         nss.append(s[len(s) - 1])
                         for j in nss:
@@ -292,5 +293,6 @@ def find_iterative(url):
                             if d:
                                 packet = binascii.unhexlify(response)
                                 d = dnslib.DNSRecord.parse(packet)
-                                print(d)
+                                # print(d)
+                                print('THE ANSWER IS READY!')
                                 return d

@@ -1,11 +1,4 @@
-import binascii
-import socket
-import sqlite3
-from sqlite3 import Error
 from iterative import *
-
-import dnslib
-
 from caching import *
 from collections import OrderedDict
 import csv
@@ -373,7 +366,8 @@ def decode_message(message):
                     res.append("       NSCOUNT  : " + str(int(NSCOUNT, 16)))
                     res.append("       ARCOUNT  : " + str(int(ARCOUNT, 16)))
                     res.append("       ANAME    : " + ANAME)
-                    res.append("       ATYPE    : " + ATYPE + " (\"" + get_type(int(ATYPE, 16)) + "\")")
+                    # res.append("       ATYPE    : " + ATYPE + " (\"" + get_type(int(ATYPE, 16)) + "\")")
+                    res.append("       ATYPE    : " + ATYPE)
                     res.append("       ACLASS   : " + ACLASS)
                     res.append("       TTL      : " + str(TTL))
                     res.append("       RDLENGTH : " + str(RDLENGTH))
@@ -529,221 +523,6 @@ def decode_message(message):
 
         return "\n".join(res), dic, other_servers, answer_found
 
-def build_message_iterative(type, address):
-    ID = 14579
-    message = ""
-    message += "{:04x}".format(ID)
-
-    QR = 0  # Query: 0, Response: 1  1bit
-    OPCODE = 0  # Standard query    4bit
-    AA = 0  # Authoritative Answer 1bit
-    TC = 0  # truncated 1bit
-    RD = 0  # Recursion 1bit
-    RA = 0  # Recursion Available  1bit
-    Z = 0  # zero 3bit
-
-    RCODE = 0  # Response code 4bit
-
-    flags = str(QR)
-    flags += str(OPCODE).zfill(4)
-    flags += str(AA) + str(TC) + str(RD) + str(RA)
-    flags += str(Z).zfill(3)
-    flags += str(RCODE).zfill(4)
-    flags = "{:04x}".format(int(flags, 2))
-
-    QDCOUNT = 1  # Number of questions           4bit
-    ANCOUNT = 0  # Number of answers             4bit
-    NSCOUNT = 0  # Number of authority records   4bit
-    ARCOUNT = 0  # Number of additional records  4bit
-
-    message += flags
-    message += "{:04x}".format(QDCOUNT)
-    message += "{:04x}".format(ANCOUNT)
-    message += "{:04x}".format(NSCOUNT)
-    message += "{:04x}".format(ARCOUNT)
-
-    addrsSplit = address.split(".")
-    qnameSize = 0
-    global Qname_size
-    for part in addrsSplit:
-        byteTosned = "{:02x}".format(len(part))
-
-        host_part = binascii.hexlify(part.encode())
-        message += byteTosned
-        message += host_part.decode()
-        qnameSize += len(byteTosned)
-        qnameSize += len(host_part.decode())
-
-    Qname_size = qnameSize
-
-    message += "00"
-
-    QTYPE = get_type(type)
-    message += QTYPE
-
-    QCLASS = 1
-    message += "{:04x}".format(QCLASS)
-
-    return message
-
-def decode_message_iterative(message):
-    other_servers = []
-    answer_found = False
-
-
-    ANCOUNT = message[12:16]
-    print('ANCount : ' + ANCOUNT)
-    NSCOUNT = message[16:20]
-    print('NSCount : ' + NSCOUNT)
-    ARCOUNT = message[20:24]
-    print('ARCount : ' + ARCOUNT)
-
-    qname_end = 24 + Qname_size + 2
-
-    Qtype_start = qname_end
-
-    Qclass_start = Qtype_start + 4
-
-    # Answer section
-    answer_start = Qclass_start + 4
-    typ = ""
-    answer_num = max([int(ANCOUNT, 16), int(NSCOUNT, 16), int(ARCOUNT, 16)])
-    if answer_num > 0:
-        print("\n# ANSWER PART :")
-
-        if int(ANCOUNT, 16) > 0:
-            answer_found = True
-            print("ANCOUNT==>")
-            print("ooohhh Answer Hereeee!!")
-            for answer in range(int(ANCOUNT, 16)):
-                if (answer_start < len(message)):
-
-                    ATYPE = message[answer_start + 4:answer_start + 8]
-
-                    RDLENGTH = int(message[answer_start + 20:answer_start + 24], 16)
-                    RDDATA = message[answer_start + 24:answer_start + 24 + (RDLENGTH * 2)]
-
-                    if ATYPE == get_type("A"):
-                        octets = [RDDATA[i:i + 2] for i in range(0, len(RDDATA), 2)]
-
-                        ip = ""
-                        for x in octets:
-                            ip += str(int(x, 16))
-                            if (octets.index(x) != len(octets) - 1):
-                                ip += '.'
-                        RDDATA_decoded = ip
-
-                    else:
-                        string = ""
-                        arr = parse_parts(RDDATA, 0, [])
-                        for x in arr:
-
-                            string += binascii.unhexlify(x).decode('iso8859-1')
-
-                            if (arr.index(x) != len(arr) - 1):
-                                string += '.'
-                        RDDATA_decoded = string
-                    answer_start = answer_start + 24 + (RDLENGTH * 2)
-
-                try:
-                    ATYPE
-                except NameError:
-                    None
-                else:
-
-                    print(" ANSWER Part : " + str(answer + 1))
-
-                    print("RDDATA decoded: " + RDDATA_decoded + "\n")
-
-        if int(NSCOUNT, 16) > 0:
-            print("NSCOUNT==>")
-            for answer in range(int(NSCOUNT, 16)):
-                if (answer_start < len(message)):
-
-                    ATYPE = message[answer_start + 4:answer_start + 8]
-
-                    RDLENGTH = int(message[answer_start + 20:answer_start + 24], 16)
-                    RDDATA = message[answer_start + 24:answer_start + 24 + (RDLENGTH * 2)]
-
-                    if ATYPE == get_type("A"):
-                        octets = [RDDATA[i:i + 2] for i in range(0, len(RDDATA), 2)]
-
-                        ip = ""
-                        for x in octets:
-                            ip += str(int(x, 16))
-                            if (octets.index(x) != len(octets) - 1):
-                                ip += '.'
-                        RDDATA_decoded = ip
-
-                    else:
-                        string = ""
-                        arr = parse_parts(RDDATA, 0, [])
-                        for x in arr:
-
-                            string += binascii.unhexlify(x).decode('iso8859-1')
-
-                            if (arr.index(x) != len(arr) - 1):
-                                string += '.'
-                        RDDATA_decoded = string
-                    answer_start = answer_start + 24 + (RDLENGTH * 2)
-
-                try:
-                    ATYPE
-                except NameError:
-                    None
-                else:
-                    print(" ANSWER Part " + str(answer + 1))
-
-                    print("RDDATA decoded : " + RDDATA_decoded + "\n")
-
-        if int(ARCOUNT, 16) > 0:
-            print("ARCOUNT==>")
-
-            for answer in range(int(ARCOUNT, 16)):
-                if (answer_start < len(message)):
-                    ATYPE = message[answer_start + 4:answer_start + 8]
-                    typ = get_type(int(ATYPE, 16))
-
-                    RDLENGTH = int(message[answer_start + 20:answer_start + 24], 16)
-                    RDDATA = message[answer_start + 24:answer_start + 24 + (RDLENGTH * 2)]
-
-                if ATYPE == get_type("A"):
-                    octets = [RDDATA[i:i + 2] for i in range(0, len(RDDATA), 2)]
-
-                    ip = ""
-                    for x in octets:
-                        ip += str(int(x, 16))
-                        if (octets.index(x) != len(octets) - 1):
-                            ip += '.'
-                    RDDATA_decoded = ip
-
-                else:
-                    string = ""
-                    arr = parse_parts(RDDATA, 0, [])
-                    for x in arr:
-
-                        string += binascii.unhexlify(x).decode('iso8859-1')
-
-                        if (arr.index(x) != len(arr) - 1):
-                            string += '.'
-                    RDDATA_decoded = string
-                answer_start = answer_start + 24 + (RDLENGTH * 2)
-                if typ == 'A':
-                    print("hereee")
-
-                    other_servers.append(RDDATA_decoded)
-
-                try:
-                    ATYPE
-                except NameError:
-                    None
-                else:
-                    print(" ANSWER Part : " + str(answer + 1))
-
-                    print("RDDATA decoded : " + RDDATA_decoded + "\n")
-
-    return other_servers, answer_found
-
 
 def get_type(type):
     types = ["ERROR", "A", "NS", "MD", "MF", "CNAME", "SOA", "MB", "MG", "MR", "NULL", "WKS", "PTS", "HINFO", "MINFO",
@@ -777,7 +556,7 @@ def print_message(msg):
 if __name__ == '__main__':
     count = {}  # used in caching
 
-    database = "cache.db"
+    database = "cache.sql"
     conn = create_connection(database)
 
     dns_cache_table = """ CREATE TABLE IF NOT EXISTS dns_cache (
@@ -857,14 +636,8 @@ if __name__ == '__main__':
 
             # importing from a csv file
             elif user_input == 2:
-                # while True:
-                    # recursion = int(input(">>> Recursive Queries(1) or Iterative Queries?(0)"))
-                    # if recursion == 1 or recursion == 0:
-                    #     break
-                    # else:
-                    #     print('   >>> You Have to enter 0 or 1! Try again...')
                 recursion = 1
-                records = ['HOSTNAME', 'A', 'TXT']
+                records = ['HOSTNAME', 'A', 'SOA']
                 # counting lines
                 with open('csv_input.csv') as csv_file:
                     csv_reader = csv.reader(csv_file, delimiter=',')
@@ -878,18 +651,14 @@ if __name__ == '__main__':
                     # lines = len(list(csv_reader))
                     line_count = 0
                     for row in csv_reader:
-
                         try:
                             row_list = []
                             if line_count == 0:
-                                # print(f'Column names are {", ".join(row)}')
                                 line_count += 1
                             else:
                                 hostname = row[0]
                                 print('   >>> ({}/{}) : {} '.format(line_count, lines, hostname), end="")
                                 row_list.append(hostname)
-                                # host_info = socket.gethostbyaddr(hostname)
-                                # print(host_info)
                                 for r in records:
                                     if r != 'HOSTNAME':
                                         print("\t", r, end=': ')
@@ -912,7 +681,6 @@ if __name__ == '__main__':
                         except IndexError:
                             line_count += 1
                         except socket.herror:
-                            # print('Host not found')
                             row_list.append(socket.gethostbyname(hostname))
                             data.append(row_list)
                             line_count += 1
@@ -938,26 +706,26 @@ if __name__ == '__main__':
             # end of program
             elif user_input == -1:
                 break
+
             # see cache
             elif user_input == 3:
                 cache_data = get_cache(conn)
                 if len(cache_data) != 0:
                     i = 1
                     for data in cache_data:
-                        # print(data[0].split('_'))
                         d_hostname, d_record, d_recursion_bit = data[0].split('_')
 
                         if d_recursion_bit == 0:
                             d_recursion = 'iterative'
                         else:
                             d_recursion = 'recursive'
-                        # print(d_hostname, d_record, d_recursion_bit, d_recursion)
                         print('{})\t{} ({} record with RD={}) :\n\t{}\n\t\n'.format(i, d_hostname, d_record,
-                                                                                        d_recursion_bit, data[1]
-                                                                                        ))
+                                                                                    d_recursion_bit, data[1]
+                                                                                    ))
                         i += 1
                 else:
                     print('The Cache is Empty')
+
             # clear cache
             elif user_input == 4:
                 if input('Are you Sure?\nType \"Y\" to continue: ').upper() == 'Y':

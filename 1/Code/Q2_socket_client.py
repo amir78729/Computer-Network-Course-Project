@@ -1,3 +1,4 @@
+import binascii
 import socket
 
 msgFromClient = "Hello Server:)"
@@ -17,8 +18,5 @@ print('The message has been sent to Server!\nPORT: {}\nADDRESS: {}'.format(serve
 
 msgFromServer = UDP_client_socket.recvfrom(bufferSize)
 
-msg = "Message from Server: {}".format(msgFromServer[0])
+msg = "Message from Server: {} ({})".format(msgFromServer[0], msgFromServer[0].hex())
 print(msg)
-
-DNS_record = socket.gethostbyname("google.com")
-print(DNS_record)
