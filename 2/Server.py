@@ -66,10 +66,6 @@ class Server:
     def delete_user(self, username):
         delete_user_from_database(self.conn_user_password, username)
 
-    # TODO: a single user cannot send message to server. I don'r know where the problem is
-    #  Maybe using threads is the solution
-    #  https://stackoverflow.com/questions/42222425/python-sockets-multiple-messages-on-same-connection
-
     def handle_client(self, c, addr):
         # c.send(str.encode('Server is working:'))
         print('someone is connected!'.upper())
@@ -78,26 +74,19 @@ class Server:
             print('- ' * 20)
             self.print_server_info()
             print('waiting for clients...'.upper())
-            # try:
-            # print('waiting for clients...'.upper(), end='')
-            # c, addr = s.accept()
             message_length = int(c.recv(self.MESSAGE_SIZE_LENGTH).decode(self.ENCODING))
             received_message = c.recv(message_length).decode(self.ENCODING).split()
-
             command = received_message[0]
-
             print('new connection!'
                   '\n\ttype    :\t{}'
                   '\n\tfrom    :\t{}:{}'
                   '\n\tat      :\t{}'.format(command, addr[0], addr[1],
                                              datetime.datetime.now().strftime("%c")).upper())
 
+            # login
             if command == 'login':
-                # if received_message[1] in self.users.keys():
                 username, password = received_message[1], received_message[2]
-
                 if check_if_user_exists(self.conn_user_password, username):
-                    # if self.users[received_message[1]] == received_message[2]:
                     if check_password(self.conn_user_password, username, password):
                         self.send_message_to_client(c, 'logged in successfully')
                         print('\tstatus  :\tsuccessful'.upper())
@@ -105,16 +94,19 @@ class Server:
                     else:
                         self.send_message_to_client(c, 'wrong password!')
                         print('\tstatus  :\twrong password'.upper())
+                        connected = False
                 else:
                     self.send_message_to_client(c, 'user does not exist')
                     print('\tstatus  :\tuser not found'.upper())
+                    connected = False
 
+            # sign up
             elif command == 'signup':
                 username, password = received_message[1], received_message[2]
-
                 if check_if_user_exists(self.conn_user_password, username):
                     self.send_message_to_client(c, 'user already exists!')
                     print('\tstatus  :\tuser already exist!'.upper())
+                    connected = False
                 else:
                     self.add_user(username, password)
                     self.send_message_to_client(c, 'user created successfully')
@@ -122,6 +114,7 @@ class Server:
                     self.active_users.append(username)
                     make_directory(username, self.WORKING_DIRECTORY)
 
+            # delete user
             elif command == 'delete-user':
                 username = received_message[1]
                 self.delete_user(username)
@@ -129,15 +122,17 @@ class Server:
                 print('\tstatus  :\tsuccessful'.upper())
                 self.active_users.remove(username)
                 remove_directory(username, self.WORKING_DIRECTORY)
+                connected = False
 
+            # create repository
             elif command == 'create-repo':
-                username = received_message[1]
-                repository_name = received_message[2]
+                username, repository_name = received_message[1], received_message[2]
                 parent_directory = os.path.join(self.WORKING_DIRECTORY, username)
                 make_directory(repository_name, parent_directory)
                 print('\tstatus  :\tREPOSITORY \"{}\" CREATED FOR USER \"{}\"'.format(repository_name, username))
                 self.send_message_to_client(c, 'repository created successfully')
 
+            # show repositories
             elif command == 'show-repo':
                 username = received_message[1]
                 repositories = os.listdir(os.path.join(self.WORKING_DIRECTORY, username))
@@ -145,36 +140,30 @@ class Server:
                 for repo in repositories:
                     self.send_message_to_client(c, '\t- '+repo)
 
-
             # disconnecting
             elif command == 'disconnect':
                 username = received_message[1]
                 self.active_users.remove(username)
                 connected = False
 
+            # wrong input
             else:
-                print('bad input from client!'.upper())
+                print('wrong input from client!'.upper())
 
-            # except Exception as e:
-            #     print('oops...something went wrong:'.upper())
-            #     print(e)
-            #     self.send_message_to_client(c, 'oops, something went wrong!')
         print('- ' * 20)
         self.print_server_info()
         print('waiting for clients...'.upper())
         c.close()
 
     def run_server(self):
-        # delete_user_from_database(self.conn_user_password, 'amir')
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind((self.ADDRESS, self.PORT))
         print('server is up...'.upper())
         s.listen()
         while True:
-            c, addr = s.accept()
-            th = threading.Thread(target=self.handle_client, args=(c, addr,))
+            connection, address = s.accept()
+            th = threading.Thread(target=self.handle_client, args=(connection, address,))
             th.start()
-
 
 
 if __name__ == '__main__':

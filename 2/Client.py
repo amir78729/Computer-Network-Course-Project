@@ -1,4 +1,5 @@
 import socket
+import getpass
 
 PORT = 12345
 ADDRESS = socket.gethostbyname(socket.gethostname())
@@ -6,10 +7,11 @@ MESSAGE_SIZE_LENGTH = 64
 ENCODING = 'utf-8'
 
 
-def receive_message_from_server(c):
+def receive_message_from_server(c, print_it):
     message_length = int(c.recv(MESSAGE_SIZE_LENGTH).decode(ENCODING))
-    received_message = c.recv(message_length).decode(ENCODING).upper()
-    print(received_message)
+    received_message = c.recv(message_length).decode(ENCODING)
+    if print_it:
+        print(received_message)
     return received_message
 
 
@@ -39,11 +41,12 @@ def main():
         if option == 1:
             print('login:'.upper())
             username = input(' > username:  '.upper())
-            password = input(' > password:  '.upper())
+            # password = input(' > password:  '.upper())
+            password = getpass.getpass(' > password:  '.upper())
             msg = 'login {} {}'.format(username, password)
 
             send_message(s, msg)
-            received_message = receive_message_from_server(s)
+            received_message = receive_message_from_server(s, print_it=True)
             if received_message == 'logged in successfully'.upper():
                 flag = True
 
@@ -55,7 +58,7 @@ def main():
             msg = 'signup {} {}'.format(username, password)
 
             send_message(s, msg)
-            received_message = receive_message_from_server(s)
+            received_message = receive_message_from_server(s, print_it=True)
             if received_message == 'user created successfully'.upper():
                 flag = True
 
@@ -87,7 +90,7 @@ def main():
                 repository_name = input(' > repository name:  '.upper())
                 msg = 'create-repo {} {}'.format(username, repository_name)
                 send_message(s, msg)
-                receive_message_from_server(s)
+                receive_message_from_server(s, print_it=True)
 
             # select repositories
             elif option == 2:
@@ -97,9 +100,9 @@ def main():
             elif option == 3:
                 msg = 'show-repo {}'.format(username)
                 send_message(s, msg)
-                n = int(receive_message_from_server(s))
+                n = int(receive_message_from_server(s, print_it=False))
                 for i in range(n):
-                    receive_message_from_server(s)
+                    receive_message_from_server(s, print_it=True)
                 print()
 
             # delete user
@@ -107,7 +110,7 @@ def main():
                 if input('are you sure? (enter 1 to continue)'.upper()) == '1':
                     msg = 'delete-user {}'.format(username)
                     send_message(s, msg)
-                    receive_message_from_server(s)
+                    receive_message_from_server(s, print_it=True)
                     s.close()
                     break  # end of program
 

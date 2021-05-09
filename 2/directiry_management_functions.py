@@ -17,4 +17,5 @@ def remove_directory(target_folder_name, parent_directory):
         os.rmdir(path)
         print('DIRECTORY \"{}\" removed'.format(target_folder_name))
     except Exception as e:
-        print(e)
+        # print(e)
+        shutil.rmtree(path)

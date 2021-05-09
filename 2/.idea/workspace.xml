@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1a122ee9-44fd-44c9-a16d-16ab3c1f5f96" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Client.py" beforeDir="false" afterPath="$PROJECT_DIR$/Client.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Server.py" beforeDir="false" afterPath="$PROJECT_DIR$/Server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/directiry_management_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/directiry_management_functions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user_password.sql" beforeDir="false" afterPath="$PROJECT_DIR$/user_password.sql" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -28,11 +30,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="145" column="56" selection-start-line="145" selection-start-column="56" selection-end-line="145" selection-end-column="56" />
+            <state relative-caret-position="1567">
+              <caret line="108" column="37" selection-start-line="108" selection-start-column="37" selection-end-line="108" selection-end-column="37" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -43,17 +45,20 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Client.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1921">
-              <caret line="113" selection-start-line="113" selection-end-line="113" />
+            <state relative-caret-position="221">
+              <caret line="43" column="21" selection-start-line="43" selection-start-column="21" selection-end-line="43" selection-end-column="21" />
+              <folding>
+                <element signature="e#0#13#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/directiry_management_functions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="5" column="8" lean-forward="true" selection-start-line="5" selection-start-column="8" selection-end-line="5" selection-end-column="8" />
+            <state relative-caret-position="306">
+              <caret line="18" column="26" selection-start-line="18" selection-start-column="26" selection-end-line="18" selection-end-column="26" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -69,7 +74,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/database_functions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="260">
+            <state relative-caret-position="1598">
               <caret line="95" column="29" selection-start-line="95" selection-start-column="29" selection-end-line="95" selection-end-column="29" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
@@ -109,12 +114,13 @@
       <find>recv</find>
       <find>send</find>
       <find>conn</find>
-      <find>user_passwords</find>
       <find>users_passwords</find>
       <find>parent_directory</find>
       <find>active</find>
       <find>active_</find>
       <find>users_info</find>
+      <find>user_passwords</find>
+      <find>receive_message_from_server</find>
     </findStrings>
     <replaceStrings>
       <replace>delete_user_from_database</replace>
@@ -135,8 +141,8 @@
         <option value="$PROJECT_DIR$/user_password.sql" />
         <option value="$PROJECT_DIR$/database_functions.py" />
         <option value="$PROJECT_DIR$/directiry_management_functions.py" />
-        <option value="$PROJECT_DIR$/Server.py" />
         <option value="$PROJECT_DIR$/Client.py" />
+        <option value="$PROJECT_DIR$/Server.py" />
       </list>
     </option>
   </component>
@@ -186,7 +192,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.Client">
+  <component name="RunManager" selected="Python.Server">
     <configuration name="Client" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="2" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -255,8 +261,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.Client" />
         <item itemvalue="Python.Server" />
+        <item itemvalue="Python.Client" />
         <item itemvalue="Python.main" />
       </list>
     </recent_temporary>
@@ -275,23 +281,23 @@
       <workItem from="1619452950443" duration="3847000" />
       <workItem from="1619595448445" duration="1881000" />
       <workItem from="1619682318499" duration="592000" />
-      <workItem from="1620285693268" duration="20820000" />
+      <workItem from="1620285693268" duration="22601000" />
+      <workItem from="1620575605681" duration="2641000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="56351000" />
+    <option name="totallyTimeSpent" value="60773000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.13257882" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.13419564" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32978722" />
-      <window_info active="true" anchor="bottom" x="22" y="247" width="1237" height="186" id="Run" order="2" visible="true" weight="0.17730497" />
+      <window_info active="true" anchor="bottom" x="22" y="247" width="1237" height="186" id="Run" order="2" visible="true" weight="0.13120568" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -313,9 +319,9 @@
     <option name="version" value="1" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/2$Client.coverage" NAME="Client Coverage Results" MODIFIED="1620313655938" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/2$Client.coverage" NAME="Client Coverage Results" MODIFIED="1620324943610" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/2$main.coverage" NAME="main Coverage Results" MODIFIED="1619128379669" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/2$Server.coverage" NAME="Server Coverage Results" MODIFIED="1620313653971" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/2$Server.coverage" NAME="Server Coverage Results" MODIFIED="1620578128805" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/users.csv" />
@@ -329,21 +335,18 @@
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/2and3/threading.pyi">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/users.sql">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/users.db">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/user_info.sql">
+    <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/user_password.sql">
+    <entry file="file://$PROJECT_DIR$/users.sql">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/database_functions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="260">
+        <state relative-caret-position="1598">
           <caret line="95" column="29" selection-start-line="95" selection-start-column="29" selection-end-line="95" selection-end-column="29" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
@@ -351,32 +354,38 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
+    <entry file="file://$PROJECT_DIR$/user_password.sql">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/Server.py">
+    <entry file="file://$PROJECT_DIR$/user_info.sql">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/directiry_management_functions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="145" column="56" selection-start-line="145" selection-start-column="56" selection-end-line="145" selection-end-column="56" />
+        <state relative-caret-position="306">
+          <caret line="18" column="26" selection-start-line="18" selection-start-column="26" selection-end-line="18" selection-end-column="26" />
           <folding>
-            <element signature="e#0#13#0" expanded="true" />
+            <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Client.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1921">
-          <caret line="113" selection-start-line="113" selection-end-line="113" />
+        <state relative-caret-position="221">
+          <caret line="43" column="21" selection-start-line="43" selection-start-column="21" selection-end-line="43" selection-end-column="21" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/directiry_management_functions.py">
+    <entry file="file://$PROJECT_DIR$/Server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="8" lean-forward="true" selection-start-line="5" selection-start-column="8" selection-end-line="5" selection-end-column="8" />
+        <state relative-caret-position="1567">
+          <caret line="108" column="37" selection-start-line="108" selection-start-column="37" selection-end-line="108" selection-end-column="37" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>
