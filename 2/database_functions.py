@@ -65,7 +65,7 @@ def get_table(conn_user_password, table):
 
 def check_password(conn_user_password, username, password):
     """
-    check if a username's real password is as same as input password.
+    change password
     :param conn_user_password:
     :param username:
     :param password:
@@ -74,8 +74,8 @@ def check_password(conn_user_password, username, password):
     cur = conn_user_password.cursor()
     cur.execute("SELECT * FROM users_passwords WHERE username=\'{}\'".format(username))
     result = cur.fetchall()
-    # print(result[0][1] == password)
     return result[0][1] == password
+
 
 def delete_user_from_database(conn_user_password, username):
     cur = conn_user_password.cursor()
@@ -95,6 +95,25 @@ def check_if_user_exists(conn_user_password, username):
     rows = cur.fetchall()
     return not len(rows) == 0
 
+
+def update_password(conn_user_password, new_password, username):
+    """
+    Create a new task
+    :param conn_user_password:
+    :param new_password:
+    :param username:
+    :return:
+    """
+
+    sql = "UPDATE users_passwords SET password = {} WHERE username = {}".format(new_password, username)
+
+    cur = conn_user_password.cursor()
+    try:
+        cur.execute(sql)
+        conn_user_password.commit()
+    except Exception as e:
+        print(e)
+    return cur.lastrowid
 
 # def get_response_from_cache(conn_user_password, hostname_record_recursion):
 #     """

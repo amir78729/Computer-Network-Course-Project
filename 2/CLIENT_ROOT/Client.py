@@ -1,11 +1,34 @@
 import socket
 import getpass
+import os
+import shutil
+
+
+def make_directory(new_folder_name, parent_directory):
+    try:
+        path = os.path.join(parent_directory, new_folder_name)
+        os.mkdir(path)
+        print('DIRECTORY \"{}\" CREATED'.format(new_folder_name))
+    except Exception as e:
+        pass
+
+
+def remove_directory(target_folder_name, parent_directory):
+    try:
+        path = os.path.join(parent_directory, target_folder_name)
+        os.rmdir(path)
+        print('DIRECTORY \"{}\" removed'.format(target_folder_name))
+    except Exception as e:
+        # print(e)
+        shutil.rmtree(path)
 
 PORT = 12345
 ADDRESS = socket.gethostbyname(socket.gethostname())
 MESSAGE_SIZE_LENGTH = 64
 ENCODING = 'utf-8'
 
+ROOT_PATH = os.getcwd()
+current_directory = ROOT_PATH
 
 def receive_message_from_server(c, print_it):
     message_length = int(c.recv(MESSAGE_SIZE_LENGTH).decode(ENCODING))
@@ -13,6 +36,16 @@ def receive_message_from_server(c, print_it):
     if print_it:
         print(received_message)
     return received_message
+
+
+# TODO : search file transfer
+def receive_file_from_server():
+    pass
+
+
+# TODO : search file transfer
+def send_file_to_server():
+    pass
 
 
 def send_message(client, msg):
@@ -54,7 +87,8 @@ def main():
         elif option == 2:
             print('new account:'.upper())
             username = input(' > username:  '.upper())
-            password = input(' > password:  '.upper())
+            # password = input(' > password:  '.upper())
+            password = getpass.getpass(' > password:  '.upper())
             msg = 'signup {} {}'.format(username, password)
 
             send_message(s, msg)
@@ -70,11 +104,14 @@ def main():
     else:
         print('welcome to the git service {}!'.format(username).upper())
         while True:
+            print('current word directory:'.upper(), current_directory)
             option = int(input('please select an option\n'
                                ' 1 - create repository\n'
-                               ' 2 - select repository\n'
-                               ' 3 - show repositories\n'
-                               ' 4 - delete user\n'
+                               ' 2 - show repositories (local)\n'
+                               ' 3 - show repositories (server)\n'
+                               ' 4 - select repository\n'
+                               ' 5 - update password\n'
+                               ' 6 - delete user\n'
                                '-1 - disconnect from server\n'.upper()))
 
             # disconnect
@@ -88,15 +125,22 @@ def main():
             # create repository
             elif option == 1:
                 repository_name = input(' > repository name:  '.upper())
+
+                pth = ROOT_PATH
+                make_directory(repository_name, pth)
+
                 msg = 'create-repo {} {}'.format(username, repository_name)
                 send_message(s, msg)
                 receive_message_from_server(s, print_it=True)
 
-            # select repositories
+            # show repositories (local)
             elif option == 2:
-                pass
+                repositories = os.listdir(ROOT_PATH)
+                for repo in repositories:
+                    if repo != 'Client.py':
+                        print(' - ' + repo)
 
-            # show repositories
+            # show repositories (server)
             elif option == 3:
                 msg = 'show-repo {}'.format(username)
                 send_message(s, msg)
@@ -107,6 +151,21 @@ def main():
 
             # delete user
             elif option == 4:
+                pass
+
+            # update password
+            elif option == 5:
+                new_password = getpass.getpass(' > enter new password:  '.upper())
+                confirm_new_password = getpass.getpass(' > confirm new password:  '.upper())
+                if new_password == confirm_new_password:
+                    msg = 'change-password {} {}'.format(username, new_password)
+                    send_message(s, msg)
+                    receive_message_from_server(s, print_it=True)
+                else:
+                    print('   passwords did\'nt match, try again'.upper())
+
+            # delete user
+            elif option == 6:
                 if input('are you sure? (enter 1 to continue)'.upper()) == '1':
                     msg = 'delete-user {}'.format(username)
                     send_message(s, msg)
