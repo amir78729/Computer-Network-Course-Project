@@ -226,8 +226,12 @@ class Client:
 
                     # show all repositories
                     elif option == 4:
-                        msg = 'show-repo-all'
+                        msg = 'show-repo-all {}'.format(self.username)
                         self.send_message(s, msg)
+                        n = int(self.receive_message_from_server(s, print_it=False))
+                        for i in range(n):
+                            self.receive_message_from_server(s, print_it=True)
+                        print()
 
                     # select repository
                     elif option == 5:

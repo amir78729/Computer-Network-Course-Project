@@ -84,6 +84,8 @@ def delete_user_from_database(conn_user_password, username):
     cur = conn_user_password.cursor()
     cur.execute("DELETE FROM users_passwords WHERE username=\'{}\'".format(username))
     conn_user_password.commit()
+    cur.execute("DELETE FROM users_repositories WHERE username=\'{}\'".format(username))
+    conn_user_password.commit()
 
 
 def check_if_user_exists(conn_user_password, username):

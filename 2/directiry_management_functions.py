@@ -6,7 +6,7 @@ def make_directory(new_folder_name, parent_directory):
     try:
         path = os.path.join(parent_directory, new_folder_name)
         os.mkdir(path)
-        print('DIRECTORY \"{}\" CREATED'.format(new_folder_name))
+        # print('DIRECTORY \"{}\" CREATED'.format(new_folder_name))
     except Exception as e:
         pass
 

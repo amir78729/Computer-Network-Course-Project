@@ -170,13 +170,30 @@ class Server:
                     repositories = os.listdir(os.path.join(self.WORKING_DIRECTORY, username))
                     self.send_message_to_client(c, str(len(repositories)))
                     for repo in repositories:
-                        self.send_message_to_client(c, '    - '+repo)
+                        self.send_message_to_client(c, '   - '+repo)
 
+                # show all repositories
                 elif command == 'show-repo-all':
-                    repositories = get_table(self.conn_db, 'users_repositories')
-                    print(repositories)
+                    username = received_message[1]
+                    repositories = list(get_table(self.conn_db, 'users_repositories'))
+
+                    # filter the repositories for user (hide PRIVATE repositories if user is not a collaborator)
                     for r in repositories:
-                        print(r)
+                        u_name, repo_name, p, collabs = r[0], r[1], r[2], r[3].split()
+                        if p == 'PRVT' and username not in collabs:
+                            repositories.remove(r)
+
+                    self.send_message_to_client(c, str(len(repositories)))
+                    for r in repositories:
+                        u_name, repo_name, p, collabs = r[0], r[1], r[2], r[3].split()
+                        if p == 'PRVT':
+                            p = 'PRIVATE'
+                        else:
+                            p = 'PUBLIC'
+                        record = '   - NAME: \"{}\"\n     PRVT/PBLC: {}\n     COLLABORATORS: {} \n'.format(repo_name, p, collabs)
+                        self.send_message_to_client(c, record)
+
+
                     # self.send_message_to_client(c, str(len(repositories)))
                     # for repo in repositories:
                     #     self.send_message_to_client(c, '    - '+repo)
