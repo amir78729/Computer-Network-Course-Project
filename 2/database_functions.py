@@ -39,9 +39,12 @@ def insert_into_table(conn_user_password, table, fields, values):
     :param fields: columns
     :return:
     """
+    question_marks = '?'
+    for i in range(len(values)-1):
+        question_marks += ',?'
 
     sql = ''' INSERT INTO {}({})
-              VALUES(?,?) '''.format(table, fields)
+              VALUES({}) '''.format(table, fields, question_marks)
     cur = conn_user_password.cursor()
     try:
         cur.execute(sql, values)
@@ -51,14 +54,14 @@ def insert_into_table(conn_user_password, table, fields, values):
     return cur.lastrowid
 
 
-def get_table(conn_user_password, table):
+def get_table(conn, table):
     """
     Query all rows in the tasks table
-    :param conn_user_password: the Connection object
+    :param conn: the Connection object
     :param table: table name
     :return:
     """
-    cur = conn_user_password.cursor()
+    cur = conn.cursor()
     cur.execute("SELECT * FROM {}".format(table))
     return cur.fetchall()
 
@@ -114,6 +117,9 @@ def update_password(conn_user_password, new_password, username):
     except Exception as e:
         print(e)
     return cur.lastrowid
+
+def creat_repo_db():
+    pass
 
 # def get_response_from_cache(conn_user_password, hostname_record_recursion):
 #     """

@@ -22,44 +22,68 @@ class Server:
 
 
         # connecting to the database
-        git_user_password_database = "user_password.sql"
-        self.conn_user_password = create_connection(git_user_password_database)
+        git_database = "user_info.sql"
+        self.conn_db = create_connection(git_database)
         create_user_table_query = """ CREATE TABLE IF NOT EXISTS users_passwords (
                                                     username text PRIMARY KEY,
                                                     password text
                                                 ); """
-        if self.conn_user_password is not None:
-            create_table(self.conn_user_password, create_user_table_query)
+
+        if self.conn_db is not None:
+            create_table(self.conn_db, create_user_table_query)
         else:
             print("Error... Database is NOT active!")
 
-        # connecting to the database
-        git_user_info_database = "user_info.sql"
-        self.conn_user_info = create_connection(git_user_info_database)
-        create_user_table_query = """ CREATE TABLE IF NOT EXISTS users_info (
-                                                        username text PRIMARY KEY,
-                                                        password text
+        create_user_table_query = """ CREATE TABLE IF NOT EXISTS users_repositories (
+                                                        username text,
+                                                        repo_name text,
+                                                        prvt_or_pblc text,
+                                                        collaborators text, 
+                                                        CONSTRAINT PK_user PRIMARY KEY (username,repo_name)
                                                     ); """
-        if self.conn_user_info is not None:
-            create_table(self.conn_user_info, create_user_table_query)
+
+        if self.conn_db is not None:
+            create_table(self.conn_db, create_user_table_query)
         else:
             print("Error... Database is NOT active!")
 
     def print_server_info(self):
         print('server info'.upper())
-        print('\tnumber of users in database: {}'.format(len(get_table(self.conn_user_password, 'users_passwords'))).upper())
+        print('\tnumber of users in database: {}'.format(len(get_table(self.conn_db, 'users_passwords'))).upper())
         print('\tnumber of active users: {}'.format(len(self.active_users)).upper())
         [print('\t\t- {}'.format(i)) for i in self.active_users]
 
-    def add_user(self, username, password):
-        insert_into_table(self.conn_user_password, 'users_passwords', 'username, password', (username, password))
+    def add_user(self, c,  username, password):
+        insert_into_table(self.conn_db, 'users_passwords', 'username, password', (username, password))
+        self.send_message_to_client(c, 'user created successfully'.upper())
+        print('\tstatus  :\tsuccessful'.upper())
+        self.active_users.append(username)
+        make_directory(username, self.WORKING_DIRECTORY)
+
+    def add_repo(self, c, username, repo_name, prvt_or_pblc):
+        """
+        at first, the user (username) is the only collaborator of
+        the repository
+        :param username:
+        :param repo_name:
+        :param prvt_or_pblc:
+        :return:
+        """
+        insert_into_table(self.conn_db, 'users_repositories',
+                          'username, repo_name, prvt_or_pblc, collaborators',
+                          (username, repo_name, prvt_or_pblc, username))
+
+        parent_directory = os.path.join(self.WORKING_DIRECTORY, username)
+        make_directory(repo_name, parent_directory)
+        print('\tstatus  :\tREPOSITORY \"{}\" ({}) CREATED FOR USER \"{}\"'.format(repo_name, prvt_or_pblc, username))
+        self.send_message_to_client(c, 'repository created successfully'.upper())
 
     def update_password(self, username, new_password):
-        update_password(self.conn_user_password, new_password, username)
+        update_password(self.conn_db, new_password, username)
 
     def send_message_to_client(self, c, msg):
         # c.send(message.upper().encode('utf-8'))
-        message = msg.upper().encode(self.ENCODING)
+        message = msg.encode(self.ENCODING)
         message_length = len(message)
         message_length = str(message_length).encode(self.ENCODING)
         message_length += b' ' * (self.MESSAGE_SIZE_LENGTH - len(message_length))
@@ -67,7 +91,7 @@ class Server:
         c.send(message)
 
     def delete_user(self, username):
-        delete_user_from_database(self.conn_user_password, username)
+        delete_user_from_database(self.conn_db, username)
 
     # TODO : search file transfer
     def receive_file_from_client(self, ):
@@ -98,39 +122,35 @@ class Server:
                 # login
                 if command == 'login':
                     username, password = received_message[1], received_message[2]
-                    if check_if_user_exists(self.conn_user_password, username):
-                        if check_password(self.conn_user_password, username, password):
-                            self.send_message_to_client(c, 'logged in successfully')
+                    if check_if_user_exists(self.conn_db, username):
+                        if check_password(self.conn_db, username, password):
+                            self.send_message_to_client(c, 'logged in successfully'.upper())
                             print('\tstatus  :\tsuccessful'.upper())
                             self.active_users.append(username)
                         else:
-                            self.send_message_to_client(c, 'wrong password!')
+                            self.send_message_to_client(c, 'wrong password!'.upper())
                             print('\tstatus  :\twrong password'.upper())
                             connected = False
                     else:
-                        self.send_message_to_client(c, 'user does not exist')
+                        self.send_message_to_client(c, 'user does not exist'.upper())
                         print('\tstatus  :\tuser not found'.upper())
                         connected = False
 
                 # sign up
                 elif command == 'signup':
                     username, password = received_message[1], received_message[2]
-                    if check_if_user_exists(self.conn_user_password, username):
-                        self.send_message_to_client(c, 'user already exists!')
+                    if check_if_user_exists(self.conn_db, username):
+                        self.send_message_to_client(c, 'user already exists!'.upper())
                         print('\tstatus  :\tuser already exist!'.upper())
                         connected = False
                     else:
-                        self.add_user(username, password)
-                        self.send_message_to_client(c, 'user created successfully')
-                        print('\tstatus  :\tsuccessful'.upper())
-                        self.active_users.append(username)
-                        make_directory(username, self.WORKING_DIRECTORY)
+                        self.add_user(c, username, password)
 
                 # delete user
                 elif command == 'delete-user':
                     username = received_message[1]
                     self.delete_user(username)
-                    self.send_message_to_client(c, 'user deleted successfully')
+                    self.send_message_to_client(c, 'user deleted successfully'.upper())
                     print('\tstatus  :\tsuccessful'.upper())
                     self.active_users.remove(username)
                     remove_directory(username, self.WORKING_DIRECTORY)
@@ -138,19 +158,28 @@ class Server:
 
                 # create repository
                 elif command == 'create-repo':
-                    username, repository_name = received_message[1], received_message[2]
-                    parent_directory = os.path.join(self.WORKING_DIRECTORY, username)
-                    make_directory(repository_name, parent_directory)
-                    print('\tstatus  :\tREPOSITORY \"{}\" CREATED FOR USER \"{}\"'.format(repository_name, username))
-                    self.send_message_to_client(c, 'repository created successfully')
 
-                # show repositories
+                    username, repository_name = received_message[1], received_message[2]
+                    repository_name, privacy = repository_name.split('_')
+                    self.add_repo(c, username, repository_name, privacy)
+
+
+                # show repositories for a single user
                 elif command == 'show-repo':
                     username = received_message[1]
                     repositories = os.listdir(os.path.join(self.WORKING_DIRECTORY, username))
                     self.send_message_to_client(c, str(len(repositories)))
                     for repo in repositories:
-                        self.send_message_to_client(c, '\t- '+repo)
+                        self.send_message_to_client(c, '    - '+repo)
+
+                elif command == 'show-repo-all':
+                    repositories = get_table(self.conn_db, 'users_repositories')
+                    print(repositories)
+                    for r in repositories:
+                        print(r)
+                    # self.send_message_to_client(c, str(len(repositories)))
+                    # for repo in repositories:
+                    #     self.send_message_to_client(c, '    - '+repo)
 
                 # disconnecting
                 elif command == 'disconnect':
@@ -164,7 +193,7 @@ class Server:
                     new_password = received_message[2]
                     self.update_password(username, new_password)
                     print('\tstatus  :\tPASSWORD SUCCESSFULLY UPDATED FOR USER \"{}\"'.format(username))
-                    self.send_message_to_client(c, 'PASSWORD CHANGED SUCCESSFULLY')
+                    self.send_message_to_client(c, 'password changed successfully'.upper())
 
                 # wrong input
                 else:

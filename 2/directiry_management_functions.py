@@ -19,3 +19,6 @@ def remove_directory(target_folder_name, parent_directory):
     except Exception as e:
         # print(e)
         shutil.rmtree(path)
+
+def copy_directory(src, dst):
+    shutil.copytree(src, dst, copy_function=shutil.copy)
