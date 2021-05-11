@@ -120,6 +120,27 @@ def update_password(conn_user_password, new_password, username):
         print(e)
     return cur.lastrowid
 
+
+def update_contributor(conn_user_password, contributor, repo_name, username):
+    """
+    Create a new task
+    :param conn_user_password:
+    :param contributor:
+    :param username:
+    :param repo_name:
+    :return:
+    """
+
+    sql = "UPDATE users_repositories SET contributor = \"{}\" WHERE repo_name = {} AND username = {}".format(contributor, repo_name, username)
+
+    cur = conn_user_password.cursor()
+    try:
+        cur.execute(sql)
+        conn_user_password.commit()
+    except Exception as e:
+        print(e)
+    return cur.lastrowid
+
 def creat_repo_db():
     pass
 

@@ -38,7 +38,7 @@ class Server:
                                                         username text,
                                                         repo_name text,
                                                         prvt_or_pblc text,
-                                                        collaborators text, 
+                                                        contributor text, 
                                                         CONSTRAINT PK_user PRIMARY KEY (username,repo_name)
                                                     ); """
 
@@ -70,7 +70,7 @@ class Server:
         :return:
         """
         insert_into_table(self.conn_db, 'users_repositories',
-                          'username, repo_name, prvt_or_pblc, collaborators',
+                          'username, repo_name, prvt_or_pblc, contributor',
                           (username, repo_name, prvt_or_pblc, username))
 
         parent_directory = os.path.join(self.WORKING_DIRECTORY, username)
@@ -172,6 +172,51 @@ class Server:
                     for repo in repositories:
                         self.send_message_to_client(c, '   - '+repo)
 
+                # show all users
+                elif command == 'show-users':
+                    # list all users from database for client
+                    username = received_message[1]
+                    users = list(get_table(self.conn_db, 'users_passwords'))
+                    for r in users:
+                        if r[0] == username:
+                            users.remove(r)
+
+                    self.send_message_to_client(c, str(len(users)))
+                    response = ''
+                    i = 1
+                    for r in users:
+                        response += '   {} - {}'.format(i, r[0])
+                        i += 1
+                    self.send_message_to_client(c, response)
+
+                # add contributor
+                elif command == 'add-contributor':
+                    # after "show-users"...
+                    username = received_message[1]
+                    target_repo = received_message[2]
+                    choice_of_client = received_message[3]
+
+                    users = list(get_table(self.conn_db, 'users_passwords'))
+                    for r in users:
+                        if r[0] == username:
+                            users.remove(r)
+
+                    if username == '%cancel%':
+                        print('\tstatus  :\tCANCELED')
+                    else:
+                        contributor = users[int(choice_of_client) - 1][0]
+
+                        cur = self.conn_db.cursor()
+                        cur.execute("SELECT contributor FROM users_repositories WHERE username=? and repo_name=?", (username,target_repo))
+                        old_contributor = cur.fetchall()[0][0]
+
+                        new_contributor = old_contributor + " " + contributor
+                        print(old_contributor, contributor, '-', new_contributor)
+                        update_contributor(self.conn_db, new_contributor, target_repo, username)
+
+                        print('\tstatus  :\t{} IS NOW A CONTRIBUTOR OF {}'.format(contributor, target_repo))
+
+
                 # show all repositories
                 elif command == 'show-repo-all':
                     username = received_message[1]
@@ -190,7 +235,7 @@ class Server:
                             p = 'PRIVATE'
                         else:
                             p = 'PUBLIC'
-                        record = '   - NAME: \"{}\"\n     PRVT/PBLC: {}\n     COLLABORATORS: {} \n'.format(repo_name, p, collabs)
+                        record = '   - NAME: \"{}\"\n     PRVT/PBLC: {}\n     CONTRIBUTOR: {} \n'.format(repo_name, p, collabs)
                         self.send_message_to_client(c, record)
 
 
@@ -216,6 +261,7 @@ class Server:
                 else:
                     print('wrong input from client!'.upper())
             except Exception as e:
+                print(e)
                 print('\ttype    :\t{}'
                       '\n\tfrom    :\t{}:{}'
                       '\n\tat      :\t{}'.format('CONNECTION-LOST', addr[0], addr[1],
