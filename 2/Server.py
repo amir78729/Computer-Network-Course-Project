@@ -109,12 +109,13 @@ class Server:
             try:
                 print('- ' * 20)
                 self.print_server_info()
+                os.chdir(self.WORKING_DIRECTORY)
                 print('waiting for clients...'.upper())
                 message_length = int(c.recv(self.MESSAGE_SIZE_LENGTH).decode(self.ENCODING))
-                received_message = c.recv(message_length).decode(self.ENCODING).split()
+                received_message = c.recv(message_length).decode(self.ENCODING).split('`')
                 command = received_message[0]
                 print('new request!'
-                      '\n\ttype    :\t{}'
+                      '\n\ttype    :\t[{}]'
                       '\n\tfrom    :\t{}:{}'
                       '\n\tat      :\t{}'.format(command, addr[0], addr[1],
                                                  datetime.datetime.now().strftime("%c")).upper())
@@ -158,7 +159,6 @@ class Server:
 
                 # create repository
                 elif command == 'create-repo':
-
                     username, repository_name = received_message[1], received_message[2]
                     repository_name, privacy = repository_name.split('_')
                     self.add_repo(c, username, repository_name, privacy)
@@ -171,6 +171,30 @@ class Server:
                     self.send_message_to_client(c, str(len(repositories)))
                     for repo in repositories:
                         self.send_message_to_client(c, '   - '+repo)
+
+                # push
+                elif command == 'push':
+                    username = received_message[1]
+                    repo = received_message[2]
+                    file_name = received_message[3]
+                    file_size = received_message[4]
+                    file_content = received_message[5]
+                    print('\tstatus  :\tsuccessful'.upper())
+                    print('\tUSERNAME:\t{}'.format(username))
+                    print('\tREPO.   :\t{}'.format(repo))
+                    print('\tF.NAME  :\t{}'.format(file_name))
+                    print('\tF.SIZE  :\t{}'.format(file_size))
+
+                    path = os.path.join(self.WORKING_DIRECTORY, username)
+                    path = os.path.join(path, repo)
+                    os.chdir(path)
+                    # file_path = '{}.{}'.format(path, file_name)
+                    # file = open('{}'.format(file_name), 'w')
+                    file = open(file_name, 'w')
+                    # file = open(os.path.join(self.current_directory, file_name), 'w')
+                    file.write(file_content)
+                    self.send_message_to_client(c, 'FILE {} RECEIVED'.format(file_name))
+                    file.close()
 
                 # show all users
                 elif command == 'show-users':
@@ -215,7 +239,6 @@ class Server:
                         update_contributor(self.conn_db, new_contributor, target_repo, username)
 
                         print('\tstatus  :\t{} IS NOW A CONTRIBUTOR OF {}'.format(contributor, target_repo))
-
 
                 # show all repositories
                 elif command == 'show-repo-all':

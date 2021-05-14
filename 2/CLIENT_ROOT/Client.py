@@ -70,64 +70,75 @@ class Client:
 
     def manage_repository(self,s,  repo, repo_dir):
         while True:
-            hr()
-            print(Fore.LIGHTBLACK_EX, 'current directory:'.upper(), self.current_directory, Fore.WHITE)
-            print('repository: '.upper(), repo)
-            option = int(input('please select an option\n'
-                               ' 1 - commit\n'
-                               ' 2 - push to server\n'
-                               ' 3 - pull from server\n'
-                               ' 4 - add contributor\n'
-                               '-1 - back to menu\n'
-                               ' > '.upper()))
-            # main menu
-            if option == -1:
-                return
+            try:
+                hr()
+                print(Fore.LIGHTBLACK_EX, 'current directory:'.upper(), self.current_directory, Fore.WHITE)
+                print('repository: '.upper(), repo)
+                option = int(input('please select an option\n'
+                                   ' 1 - commit\n'
+                                   ' 2 - push to server\n'
+                                   ' 3 - pull from server\n'
+                                   ' 4 - add contributor\n'
+                                   '-1 - back to menu\n'
+                                   ' > '.upper()))
+                # main menu
+                if option == -1:
+                    return
 
-            # commit
-            elif option == 1:
-                pass
+                # commit
+                elif option == 1:
+                    pass
 
-            # push
-            elif option == 2:
-                pass
+                # push
+                elif option == 2:
+
+                    files = os.listdir(self.current_directory)
+                    for file_name in files:
+                        file_content = open(file_name, 'r')
+                        path = os.path.abspath(file_name)
+                        file_size = os.path.getsize(os.path.join(self.current_directory, file_name))
+                        print('FILE NAME: {}\nABSOLUTE PATH: {}\nSIZE: {}'.format(file_name, path, file_size))
+                        msg = 'push`{}`{}`{}`{}`{}'.format(self.username, repo, file_name, file_size, file_content)
+                        self.send_message(s, msg)
+                        self.receive_message_from_server(s, print_it=True)
 
 
-            # pull
-            elif option == 3:
-                pass
+                # pull
+                elif option == 3:
+                    pass
 
-            # add contributor
-            elif option == 4:
-                """
-                FRIENDLY REMINDER:
-                in users_repositories table, the "Contributor" format is a string like this:
-                'OWNER Contributor1 Contributor2 ... ContributorN'
-                """
-                msg = 'show-users {}'.format(self.username)
-                self.send_message(s, msg)
-                user_count = int(self.receive_message_from_server(s, print_it=False))
-                self.receive_message_from_server(s, print_it=True)
+                # add contributor
+                elif option == 4:
+                    """
+                    FRIENDLY REMINDER:
+                    in users_repositories table, the "Contributor" format is a string like this:
+                    'OWNER Contributor1 Contributor2 ... ContributorN'
+                    """
+                    msg = 'show-users`{}'.format(self.username)
+                    self.send_message(s, msg)
+                    user_count = int(self.receive_message_from_server(s, print_it=False))
+                    self.receive_message_from_server(s, print_it=True)
 
-                while True:
-                    try:
-                        # asking server to show us all the users
-                        print(user_count)
-                        choice = int(input('> SELECT A NUMBER (-1 to cancel): '))
+                    while True:
+                        try:
+                            # asking server to show us all the users
+                            print(user_count)
+                            choice = int(input('> SELECT A NUMBER (-1 to cancel): '))
 
-                        if 1 <= choice <= user_count:
-                            msg2 = 'add-contributor {} {} {}'.format(self.username, repo, choice)
-                            self.send_message(s, msg2)
-                            break
-                        elif choice == -1:
-                            self.send_message(s, 'add-contributor %cancel% x x')
-                            break
-                        else:
+                            if 1 <= choice <= user_count:
+                                msg2 = 'add-contributor {} {} {}'.format(self.username, repo, choice)
+                                self.send_message(s, msg2)
+                                break
+                            elif choice == -1:
+                                self.send_message(s, 'add-contributor %cancel% x x')
+                                break
+                            else:
+                                print(Fore.RED, 'bad input! try again', Fore.WHITE)
+                        except Exception as e:
                             print(Fore.RED, 'bad input! try again', Fore.WHITE)
-                    except Exception as e:
-                        print(Fore.RED, 'bad input! try again', Fore.WHITE)
-                        print(e)
-
+                            print(e)
+            except Exception as e:
+                print(e)
 
 
 
@@ -161,7 +172,7 @@ class Client:
                 username = input(' > username:  '.upper())
                 # password = input(' > password:  '.upper())
                 password = getpass.getpass(' > password:  '.upper())
-                msg = 'login {} {}'.format(username, password)
+                msg = 'login`{}`{}'.format(username, password)
 
                 self.send_message(s, msg)
                 received_message = self.receive_message_from_server(s, print_it=True)
@@ -175,7 +186,7 @@ class Client:
                 username = input(' > username:  '.upper())
                 # password = input(' > password:  '.upper())
                 password = getpass.getpass(' > password:  '.upper())
-                msg = 'signup {} {}'.format(username, password)
+                msg = 'signup`{}`{}'.format(username, password)
 
                 self.send_message(s, msg)
                 received_message = self.receive_message_from_server(s, print_it=True)
@@ -208,7 +219,7 @@ class Client:
                     # disconnect
                     if option == -1:
                         if input('are you sure? (enter 1 to continue)'.upper()) == '1':
-                            msg = 'disconnect {}'.format(self.username)
+                            msg = 'disconnect`{}'.format(self.username)
                             self.send_message(s, msg)
                             s.close()
                             break  # end of program
@@ -231,7 +242,7 @@ class Client:
                         pth = self.ROOT_PATH
                         make_directory(repository_name, pth)
 
-                        msg = 'create-repo {} {}_{}'.format(self.username, repository_name, prvt_or_pblc)
+                        msg = 'create-repo`{}`{}_{}'.format(self.username, repository_name, prvt_or_pblc)
                         self.send_message(s, msg)
                         self.receive_message_from_server(s, print_it=True)
 
@@ -244,7 +255,7 @@ class Client:
 
                     # show repositories (server)
                     elif option == 3:
-                        msg = 'show-repo {}'.format(self.username)
+                        msg = 'show-repo`{}'.format(self.username)
                         self.send_message(s, msg)
                         n = int(self.receive_message_from_server(s, print_it=False))
                         for i in range(n):
@@ -253,7 +264,7 @@ class Client:
 
                     # show all repositories
                     elif option == 4:
-                        msg = 'show-repo-all {}'.format(self.username)
+                        msg = 'show-repo-all`{}'.format(self.username)
                         self.send_message(s, msg)
                         n = int(self.receive_message_from_server(s, print_it=False))
                         for i in range(n):
@@ -280,8 +291,10 @@ class Client:
                                         current_repository = repositories[int(n) - 1]
                                         print(Fore.GREEN, 'REPOSITORY \"{}\" SELECTED!'.format(current_repository), Fore.WHITE)
                                         self.current_directory = os.path.join(self.ROOT_PATH, current_repository)
+                                        os.chdir(self.current_directory)
                                         self.manage_repository(s, current_repository, self.current_directory)
                                         self.current_directory = self.ROOT_PATH
+                                        # os.chdir(self.current_directory)
                                         break
                                     else:
                                         print(Fore.RED, 'please enter a valid input'.upper(), Fore.WHITE)
@@ -293,7 +306,7 @@ class Client:
                         new_password = getpass.getpass(' > enter new password:  '.upper())
                         confirm_new_password = getpass.getpass(' > confirm new password:  '.upper())
                         if new_password == confirm_new_password:
-                            msg = 'change-password {} {}'.format(self.username, new_password)
+                            msg = 'change-password`{}`{}'.format(self.username, new_password)
                             self.send_message(s, msg)
                             self.receive_message_from_server(s, print_it=True)
                         else:
@@ -302,7 +315,7 @@ class Client:
                     # delete user
                     elif option == 7:
                         if input('are you sure? (enter 1 to continue)'.upper()) == '1':
-                            msg = 'delete-user {}'.format(self.username)
+                            msg = 'delete-user`{}'.format(self.username)
                             self.send_message(s, msg)
                             self.receive_message_from_server(s, print_it=True)
                             s.close()
