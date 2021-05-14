@@ -126,7 +126,7 @@ class Client:
                             choice = int(input('> SELECT A NUMBER (-1 to cancel): '))
 
                             if 1 <= choice <= user_count:
-                                msg2 = 'add-contributor {} {} {}'.format(self.username, repo, choice)
+                                msg2 = 'add-contributor`{}`{}`{}'.format(self.username, repo, choice)
                                 self.send_message(s, msg2)
                                 break
                             elif choice == -1:

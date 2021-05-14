@@ -1,3 +1,0 @@
-hi
-this is a test.
-this file is located in amir's "repo1"

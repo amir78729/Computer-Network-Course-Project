@@ -173,28 +173,30 @@ class Server:
                         self.send_message_to_client(c, '   - '+repo)
 
                 # push
+                # TODO : create a table in database
                 elif command == 'push':
                     username = received_message[1]
                     repo = received_message[2]
                     file_name = received_message[3]
                     file_size = received_message[4]
                     file_content = received_message[5]
-                    print('\tstatus  :\tsuccessful'.upper())
                     print('\tUSERNAME:\t{}'.format(username))
                     print('\tREPO.   :\t{}'.format(repo))
                     print('\tF.NAME  :\t{}'.format(file_name))
                     print('\tF.SIZE  :\t{}'.format(file_size))
+                    try:
+                        path = os.path.join(self.WORKING_DIRECTORY, username)
+                        path = os.path.join(path, repo)
+                        os.chdir(path)
+                        file = open(file_name, 'w')
+                        file.write(file_content)
+                        self.send_message_to_client(c, 'FILE {} IS PUSHED TO SERVER'.format(file_name))
+                        file.close()
+                        print('\tstatus  :\tsuccessful'.upper())
+                    except Exception as e:
+                        print('\tSTATUS  :\t{}'.format(e))
+                        self.send_message_to_client(c, '!!! ERROR FOR PUSHING {}'.format(file_name))
 
-                    path = os.path.join(self.WORKING_DIRECTORY, username)
-                    path = os.path.join(path, repo)
-                    os.chdir(path)
-                    # file_path = '{}.{}'.format(path, file_name)
-                    # file = open('{}'.format(file_name), 'w')
-                    file = open(file_name, 'w')
-                    # file = open(os.path.join(self.current_directory, file_name), 'w')
-                    file.write(file_content)
-                    self.send_message_to_client(c, 'FILE {} RECEIVED'.format(file_name))
-                    file.close()
 
                 # show all users
                 elif command == 'show-users':
@@ -239,6 +241,17 @@ class Server:
                         update_contributor(self.conn_db, new_contributor, target_repo, username)
 
                         print('\tstatus  :\t{} IS NOW A CONTRIBUTOR OF {}'.format(contributor, target_repo))
+
+                        # copy file from source to contributor
+                        try:
+                            src = os.path.join(self.WORKING_DIRECTORY, os.path.join(username, target_repo))
+                            dest = os.path.join(self.WORKING_DIRECTORY, os.path.join(contributor, target_repo))
+                            shutil.copytree(src, dest)
+                            print('\t         \tCOPY PROCESS WAS SUCCESSFULLY')
+                        except Exception as e:
+                            print('\t         \t{}'.format(e))
+
+
 
                 # show all repositories
                 elif command == 'show-repo-all':
