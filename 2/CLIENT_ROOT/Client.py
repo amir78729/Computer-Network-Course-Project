@@ -89,16 +89,17 @@ class Client:
                 elif option == 1:
                     pass
 
+                # TODO copying process is WRONG
                 # push
                 elif option == 2:
-
                     files = os.listdir(self.current_directory)
                     for file_name in files:
                         file_content = open(file_name, 'r')
                         path = os.path.abspath(file_name)
                         file_size = os.path.getsize(os.path.join(self.current_directory, file_name))
                         print('FILE NAME: {}\nABSOLUTE PATH: {}\nSIZE: {}'.format(file_name, path, file_size))
-                        msg = 'push`{}`{}`{}`{}`{}'.format(self.username, repo, file_name, file_size, file_content)
+                        msg = 'push`{}`{}`{}`{}`{}'.format(
+                            self.username, repo, file_name, file_size, file_content.read())
                         self.send_message(s, msg)
                         self.receive_message_from_server(s, print_it=True)
 
