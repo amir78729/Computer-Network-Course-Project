@@ -22,18 +22,20 @@ class Server:
 
 
         # connecting to the database
-        git_database = "user_info.sql"
+        git_database = "server_database.sql"
         self.conn_db = create_connection(git_database)
+
+        # user password table
         create_user_table_query = """ CREATE TABLE IF NOT EXISTS users_passwords (
                                                     username text PRIMARY KEY,
                                                     password text
                                                 ); """
-
         if self.conn_db is not None:
             create_table(self.conn_db, create_user_table_query)
         else:
             print("Error... Database is NOT active!")
 
+        # user repositories table
         create_user_table_query = """ CREATE TABLE IF NOT EXISTS users_repositories (
                                                         username text,
                                                         repo_name text,
@@ -41,7 +43,19 @@ class Server:
                                                         contributor text, 
                                                         CONSTRAINT PK_user PRIMARY KEY (username,repo_name)
                                                     ); """
+        if self.conn_db is not None:
+            create_table(self.conn_db, create_user_table_query)
+        else:
+            print("Error... Database is NOT active!")
 
+        # user commits table
+        create_user_table_query = """ CREATE TABLE IF NOT EXISTS users_commits (
+                                                            username text,
+                                                            repo_name text,
+                                                            path text,
+                                                            message text, 
+                                                            CONSTRAINT PK_user PRIMARY KEY (username,repo_name, message)
+                                                        ); """
         if self.conn_db is not None:
             create_table(self.conn_db, create_user_table_query)
         else:
@@ -125,9 +139,13 @@ class Server:
                     username, password = received_message[1], received_message[2]
                     if check_if_user_exists(self.conn_db, username):
                         if check_password(self.conn_db, username, password):
-                            self.send_message_to_client(c, 'logged in successfully'.upper())
-                            print('\tstatus  :\tsuccessful'.upper())
-                            self.active_users.append(username)
+                            if username in self.active_users:
+                                self.send_message_to_client(c, 'you are logged in from another location'.upper())
+                                print('\tstatus  :\talready logged in'.upper())
+                            else:
+                                self.send_message_to_client(c, 'logged in successfully'.upper())
+                                print('\tstatus  :\tsuccessful'.upper())
+                                self.active_users.append(username)
                         else:
                             self.send_message_to_client(c, 'wrong password!'.upper())
                             print('\tstatus  :\twrong password'.upper())

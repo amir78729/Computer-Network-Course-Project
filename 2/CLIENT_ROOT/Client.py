@@ -1,11 +1,58 @@
 import socket
 import getpass
 import os
+import datetime
+
 import shutil
 from colorama import Fore, Back, Style
+import sqlite3
+from sqlite3 import Error
+
+
+def print_commits(commits):
+    print(' - MESSAGE: {}\n - TIME   : {}'.format(commits[0][3], commits[0][4]))
+    for c in commits:
+        print(Fore.CYAN, '|_', c[1], Fore.WHITE)
 
 def copy_directory(src, dst):
     shutil.copytree(src, dst, copy_function=shutil.copy)
+
+
+def get_table(conn, table):
+    """
+    Query all rows in the tasks table
+    :param conn: the Connection object
+    :param table: table name
+    :return:
+    """
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM {}".format(table))
+    return cur.fetchall()
+
+
+def insert_into_table(conn_user_password, table, fields, values):
+    """
+    Create a new task
+    :param conn_user_password:
+    :param table: table name
+    :param values: records
+    :param fields: columns
+    :return:
+    """
+    question_marks = '?'
+    for i in range(len(values)-1):
+        question_marks += ',?'
+
+    sql = ''' INSERT INTO {}({})
+              VALUES({}) '''.format(table, fields, question_marks)
+    cur = conn_user_password.cursor()
+    try:
+        cur.execute(sql, values)
+        conn_user_password.commit()
+    except Exception as e:
+        print(e)
+    return cur.lastrowid
+
 
 def cls():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -31,11 +78,11 @@ def remove_directory(target_folder_name, parent_directory):
         print('DIRECTORY \"{}\" removed'.format(target_folder_name))
     except Exception as e:
         # print(e)
+        path = os.path.join(parent_directory, target_folder_name)
         shutil.rmtree(path)
 
 class Client:
     def __init__(self):
-
         self.PORT = 12345
         self.ADDRESS = socket.gethostbyname(socket.gethostname())
         self.MESSAGE_SIZE_LENGTH = 64
@@ -44,6 +91,34 @@ class Client:
 
         self.ROOT_PATH = os.getcwd()
         self.current_directory = self.ROOT_PATH
+
+        # creating database connection
+        git_database = "client_database.sql"
+        conn_user_password = None
+        try:
+            conn_user_password = sqlite3.connect(git_database, check_same_thread=False)
+            self.conn_db = conn_user_password
+        except Error as e:
+            print(e)
+        self.conn_db = conn_user_password
+
+        # create commits table
+        create_user_table_query = """ CREATE TABLE IF NOT EXISTS commits (
+                                                                repository text,
+                                                                file_path text,
+                                                                file_content text,
+                                                                message text, 
+                                                                commit_time text, 
+                                                                CONSTRAINT PK_commit PRIMARY KEY (file_path, commit_time)
+                                                            ); """
+        if self.conn_db is not None:
+            try:
+                c = self.conn_db.cursor()
+                c.execute(create_user_table_query)
+            except Error as e:
+                print(e)
+        else:
+            print("Error... Database is NOT active!")
 
     def receive_message_from_server(self, c, print_it):
         message_length = int(c.recv(self.MESSAGE_SIZE_LENGTH).decode(self.ENCODING))
@@ -68,7 +143,7 @@ class Client:
         client.send(message_length)
         client.send(message)
 
-    def manage_repository(self,s,  repo, repo_dir):
+    def manage_repository(self, s,  repo, repo_dir):
         while True:
             try:
                 hr()
@@ -79,6 +154,7 @@ class Client:
                                    ' 2 - push to server\n'
                                    ' 3 - pull from server\n'
                                    ' 4 - add contributor\n'
+                                   ' 5 - show all pending commits (local)\n'
                                    '-1 - back to menu\n'
                                    ' > '.upper()))
                 # main menu
@@ -87,9 +163,54 @@ class Client:
 
                 # commit
                 elif option == 1:
-                    pass
+                    time = datetime.datetime.now()
+                    files = os.listdir(self.current_directory)
 
-                # TODO copying process is WRONG
+                    commit_it = False
+                    message = input('INSERT COMMIT MESSAGE: (-1 TO CANCEL)\n > ')
+                    if message != '-1':
+                        commit_it = True
+                    if commit_it:
+                        for file_name in files:
+                            file_content = open(file_name, 'r')
+                            path = os.path.relpath(file_name)
+
+                            # insert commit tp database
+                            insert_into_table(self.conn_db, 'commits',
+                                              'repository, file_path, file_content, message, commit_time',
+                                              (repo, path, file_content.read(), message, time))
+                        print('FILES ARE ADDED TO LOCAL DATABASE.')
+
+                        cur = self.conn_db.cursor()
+                        cur.execute("SELECT * FROM {} WHERE commit_time = \'{}\'".format('commits', time))
+                        new_commits = cur.fetchall()
+
+                        print('NEWLY ADDED FILES TO DATABASE FROM THE LAST COMMIT:')
+                        print_commits(new_commits)
+
+                        print('\nSHOW DIFFERENCES BETWEEN THIS COMMIT AND THE ONE BEFORE:')
+                        # get times
+                        cur = self.conn_db.cursor()
+                        cur.execute("SELECT DISTINCT commit_time FROM {} ORDER BY commit_time".format('commits'))
+                        times = cur.fetchall()
+
+                        # new commit
+                        cur = self.conn_db.cursor()
+                        cur.execute("SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-1][0]))
+                        last_commit = set(cur.fetchall())
+
+                        # last commit
+                        cur = self.conn_db.cursor()
+                        cur.execute("SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-2][0]))
+                        before_last_commit = set(cur.fetchall())
+
+                        green = last_commit - before_last_commit
+                        yellow = last_commit & before_last_commit
+
+                    else:
+                        print(Fore.RED, 'CANCELED!', Fore.WHITE)
+
+                # TODO send from database not local
                 # push
                 elif option == 2:
                     files = os.listdir(self.current_directory)
@@ -138,11 +259,19 @@ class Client:
                         except Exception as e:
                             print(Fore.RED, 'bad input! try again', Fore.WHITE)
                             print(e)
+
+                elif option == 5:
+                    cur = self.conn_db.cursor()
+                    cur.execute("SELECT DISTINCT commit_time FROM {} ORDER BY commit_time".format('commits'))
+                    times = cur.fetchall()
+
+                    for t in times:
+                        cur = self.conn_db.cursor()
+                        cur.execute("SELECT * FROM {} WHERE commit_time = \'{}\'".format('commits', t[0]))
+                        print_commits(cur.fetchall())
+
             except Exception as e:
                 print(e)
-
-
-
 
     def main(self):
         # global username
@@ -251,6 +380,7 @@ class Client:
                     elif option == 2:
                         repositories = os.listdir(self.ROOT_PATH)
                         repositories.remove('Client.py')
+                        repositories.remove('client_database.sql')
                         for repo in repositories:
                             print('\t - ' + repo)
 
@@ -276,6 +406,7 @@ class Client:
                     elif option == 5:
                         repositories = os.listdir(self.ROOT_PATH)
                         repositories.remove('Client.py')
+                        repositories.remove('client_database.sql')
                         while True:
                             print('select a number (enter \"Q\" to cancel)'.upper())
                             c = 1
@@ -311,7 +442,7 @@ class Client:
                             self.send_message(s, msg)
                             self.receive_message_from_server(s, print_it=True)
                         else:
-                            print('   passwords did\'nt match, try again'.upper())
+                            print(Fore.RED, '   passwords did\'nt match, try again'.upper(), Fore.WHITE)
 
                     # delete user
                     elif option == 7:

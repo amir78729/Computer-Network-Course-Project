@@ -18,6 +18,7 @@ def remove_directory(target_folder_name, parent_directory):
         print('DIRECTORY \"{}\" removed'.format(target_folder_name))
     except Exception as e:
         # print(e)
+        path = os.path.join(parent_directory, target_folder_name)
         shutil.rmtree(path)
 
 def copy_directory(src, dst):
