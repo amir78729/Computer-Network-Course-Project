@@ -6,7 +6,7 @@ import shutil
 from colorama import Fore, Back, Style
 import sqlite3
 from sqlite3 import Error
-
+from tqdm import tqdm
 
 def copy_directory(src, dst):
     shutil.copytree(src, dst, copy_function=shutil.copy)
@@ -159,10 +159,6 @@ class Client:
               ' | REPOSITORY: {}\n'
               ' | MESSAGE   : {}\n'
               ' | TIME      : {}'.format(self.username, commits[0][0], commits[0][3], commits[0][4]))
-        # print(' | USERNAME  :', self.username)
-        # print(' | REPOSITORY:', commits[0][0])
-        # print(' | MESSAGE   :', commits[0][3])
-        # print(' | TIME      :', commits[0][4])
         print(' | FILES')
         for c in commits:
             print(' |-', Fore.CYAN, c[1], Fore.WHITE)
@@ -170,12 +166,16 @@ class Client:
         green = new - old
         yellow = new & old
         red = old - new
+
         for g in green:
-            print(' |-', Fore.GREEN, '[+]', g[0], Fore.WHITE)
+            if g != '':
+                print(' |-', Fore.GREEN, '[+]', g[0], Fore.WHITE)
         for y in yellow:
-            print(' |-', Fore.YELLOW, '[*]', y[0], Fore.WHITE)
+            if y != '':
+                print(' |-', Fore.YELLOW, '[*]', y[0], Fore.WHITE)
         for r in red:
-            print(' |-', Fore.RED, '[-]', r[0], Fore.WHITE)
+            if r != '':
+                print(' |-', Fore.RED, '[-]', r[0], Fore.WHITE)
 
     def manage_repository(self, s,  repo, repo_dir):
         while True:
@@ -206,41 +206,27 @@ class Client:
                         commit_it = True
                     if commit_it:
                         self.commit(files, repo, message, time)
-                        print('hi')
                         cur = self.conn_db.cursor()
                         cur.execute("SELECT * FROM {} WHERE commit_time = \'{}\'".format('commits', time))
                         new_commits = cur.fetchall()
 
-                        # print('\nNEWLY ADDED FILES TO DATABASE FROM THE LAST COMMIT:')
-
-                        # print('\nSHOW DIFFERENCES BETWEEN THIS COMMIT AND THE ONE BEFORE:')
                         # get times
                         cur = self.conn_db.cursor()
                         cur.execute("SELECT DISTINCT commit_time FROM {} ORDER BY commit_time".format('commits'))
                         times = cur.fetchall()
-                        print('hi')
                         # new commit
                         cur = self.conn_db.cursor()
-                        try:
-                            cur.execute(
-                                "SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-1][0]))
-                            last_commit = set(cur.fetchall())
-                        except :
-                            last_commit = set([])
+                        cur.execute(
+                            "SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-1][0]))
+                        last_commit = set(cur.fetchall())
 
                         # last commit
                         cur = self.conn_db.cursor()
-                        print('hi')
-                        try:
-                            cur.execute(
-                                "SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-2][0]))
-                            before_last_commit = set(cur.fetchall())
-                        except :
-                            before_last_commit = set([])
-                        print('hi')
+                        cur.execute(
+                            "SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-2][0]))
+                        before_last_commit = set(cur.fetchall())
                         # self.print_commifs_diff(old=before_last_commit, new=last_commit)
                         self.print_commits(commits=new_commits, old=before_last_commit, new=last_commit)
-
 
                     else:
                         print(Fore.RED, 'CANCELED!', Fore.WHITE)
@@ -248,6 +234,28 @@ class Client:
                 # TODO send from database not local
                 # push
                 elif option == 2:
+                    # send commits to server's commit database:
+                    cur = self.conn_db.cursor()
+                    cur.execute("SELECT * FROM {} WHERE repository = \'{}\'".format('commits', repo))
+                    commits = cur.fetchall()
+                    for commit in tqdm(commits, desc="SENDING COMMITS TO SERVER'S DATABASE"):
+                        msg = 'commit`{}`{}`{}`{}`{}`{}'.format(self.username,
+                                                                commit[0],
+                                                                commit[1],
+                                                                commit[2],
+                                                                commit[3],
+                                                                commit[4])
+                        self.send_message(s, msg)
+                        self.receive_message_from_server(s, print_it=False)
+
+                    # push last commit contents to the server
+                    cur = self.conn_db.cursor()
+                    cur.execute("SELECT DISTINCT commit_time FROM {} ORDER BY commit_time".format('commits'))
+                    last_commit_time = cur.fetchall()[-1]
+
+                    msg = 'push`{}`{}`{}'.format(self.username, repo, last_commit_time[0])
+                    self.send_message(s, msg)
+
                     pass
                     # files = os.listdir(self.current_directory)
                     # for file_name in files:

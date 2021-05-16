@@ -50,12 +50,12 @@ class Server:
 
         # user commits table
         create_user_table_query = """ CREATE TABLE IF NOT EXISTS users_commits (
+                                                                        username text,
                                                                         repository text,
                                                                         file_path text,
                                                                         file_content text,
                                                                         message text, 
-                                                                        commit_time text, 
-                                                                        CONSTRAINT PK_commit PRIMARY KEY (file_path, commit_time)
+                                                                        commit_time text
                                                                     ); """
         if self.conn_db is not None:
             create_table(self.conn_db, create_user_table_query)
@@ -182,7 +182,6 @@ class Server:
                     repository_name, privacy = repository_name.split('_')
                     self.add_repo(c, username, repository_name, privacy)
 
-
                 # show repositories for a single user
                 elif command == 'show-repo':
                     username = received_message[1]
@@ -191,10 +190,62 @@ class Server:
                     for repo in repositories:
                         self.send_message_to_client(c, '   - '+repo)
 
+                # get commits from users database and add to server commit table TODO db insert is not working
+                elif command == 'commit':
+                    username = received_message[1]
+                    repository = received_message[2]
+                    file_path = received_message[3]
+                    file_content = received_message[4]
+                    message = received_message[5]
+                    time = received_message[6]
+
+                    try:
+                        insert_into_table(self.conn_db, 'users_commits',
+                                          'username, repository, file_path, file_content, message, commit_time',
+                                          (username, repository, file_path, file_content, message, time))
+                    except Exception as e:
+                        print(e)
+
+                    self.send_message_to_client(c, 'FILE {} FROM COMMIT \"{}\" IS RECEIVED'.format(file_path, message))
+                    print('\tSTATUS  :\tFILE \"{}\" FROM COMMIT \"{}\", USER \"{}\" AND REPO \"{}\" ADDED TO DATABASE'
+                          .format(file_path, message, username, repository))
+
                 # push
                 # TODO : create a table in database
                 elif command == 'push':
-                    pass
+                    username = received_message[1]
+                    repo = received_message[2]
+                    last_commit_time = received_message[3]
+
+                    print(username, repo, last_commit_time)
+
+                    cur = self.conn_db.cursor()
+                    q = "SELECT * FROM {} WHERE repository = \'{}\' and commit_time = \'{}\' and username = \'{}\'"\
+                        .format('users_commits', repo, last_commit_time, username)
+
+                    q = "SELECT * FROM {} WHERE commit_time = \'{}\'" \
+                        .format('users_commits', last_commit_time)
+
+                    q = "SELECT * FROM {}" \
+                        .format('users_commits')
+                    print(q)
+                    cur.execute(q)
+                    files = cur.fetchall()
+                    print(files)
+
+                    # try:
+                    #     path = os.path.join(self.WORKING_DIRECTORY, username)
+                    #     path = os.path.join(path, repo)
+                    #     os.chdir(path)
+                    #     file = open(file_name, 'w')
+                    #     file.write(file_content)
+                    #     self.send_message_to_client(c, 'FILE {} IS PUSHED TO SERVER'.format(file_name))
+                    #     file.close()
+                    #     print('\tstatus  :\tsuccessful'.upper())
+                    # except Exception as e:
+                    #     print('\tSTATUS  :\t{}'.format(e))
+                    #     self.send_message_to_client(c, '!!! ERROR FOR PUSHING {}'.format(file_name))
+
                     # username = received_message[1]
                     # repo = received_message[2]
                     # file_name = received_message[3]
@@ -216,7 +267,6 @@ class Server:
                     # except Exception as e:
                     #     print('\tSTATUS  :\t{}'.format(e))
                     #     self.send_message_to_client(c, '!!! ERROR FOR PUSHING {}'.format(file_name))
-
 
                 # show all users
                 elif command == 'show-users':
@@ -270,8 +320,6 @@ class Server:
                             print('\t         \tCOPY PROCESS WAS SUCCESSFULLY')
                         except Exception as e:
                             print('\t         \t{}'.format(e))
-
-
 
                 # show all repositories
                 elif command == 'show-repo-all':
