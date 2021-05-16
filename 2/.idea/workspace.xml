@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1a122ee9-44fd-44c9-a16d-16ab3c1f5f96" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/11/New Text Document - Copy - Copy (2).txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/11/New Text Document - Copy - Copy.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/Client.py" beforeDir="false" afterPath="$PROJECT_DIR$/CLIENT_ROOT/Client.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/client_database.sql" beforeDir="false" afterPath="$PROJECT_DIR$/CLIENT_ROOT/client_database.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CN-P2.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/CN-P2.pdf" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -44,8 +43,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/CLIENT_ROOT/Client.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="173">
-              <caret line="194" column="65" lean-forward="true" selection-start-line="194" selection-start-column="65" selection-end-line="194" selection-end-column="65" />
+            <state relative-caret-position="20">
+              <caret line="143" column="17" selection-start-line="143" selection-start-column="17" selection-end-line="143" selection-end-column="17" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -88,7 +87,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>active</find>
       <find>active_</find>
       <find>user_passwords</find>
       <find>receive_message_from_server</find>
@@ -118,6 +116,7 @@
       <find>msg = '</find>
       <find>WHERE</find>
       <find>.remove</find>
+      <find>print_commi</find>
     </findStrings>
     <replaceStrings>
       <replace>delete_user_from_database</replace>
@@ -318,23 +317,23 @@
       <workItem from="1620575605681" duration="34741000" />
       <workItem from="1620943468506" duration="9043000" />
       <workItem from="1620982665940" duration="3865000" />
-      <workItem from="1621103599398" duration="12798000" />
+      <workItem from="1621103599398" duration="17191000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="118579000" />
+    <option name="totallyTimeSpent" value="122972000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.13985449" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.13985449" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32978722" />
-      <window_info anchor="bottom" x="22" y="247" width="1237" height="186" id="Run" order="2" visible="true" weight="0.09219858" />
+      <window_info active="true" anchor="bottom" x="22" y="247" width="1237" height="186" id="Run" order="2" visible="true" weight="0.14361702" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -428,8 +427,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/CLIENT_ROOT/Client.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="173">
-          <caret line="194" column="65" lean-forward="true" selection-start-line="194" selection-start-column="65" selection-end-line="194" selection-end-column="65" />
+        <state relative-caret-position="20">
+          <caret line="143" column="17" selection-start-line="143" selection-start-column="17" selection-end-line="143" selection-end-column="17" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>

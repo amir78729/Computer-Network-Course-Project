@@ -2,17 +2,11 @@ import socket
 import getpass
 import os
 import datetime
-
 import shutil
 from colorama import Fore, Back, Style
 import sqlite3
 from sqlite3 import Error
 
-
-def print_commits(commits):
-    print(' - MESSAGE: {}\n - TIME   : {}'.format(commits[0][3], commits[0][4]))
-    for c in commits:
-        print(Fore.CYAN, '|_', c[1], Fore.WHITE)
 
 def copy_directory(src, dst):
     shutil.copytree(src, dst, copy_function=shutil.copy)
@@ -68,7 +62,7 @@ def make_directory(new_folder_name, parent_directory):
         os.mkdir(path)
         print('DIRECTORY \"{}\" CREATED'.format(new_folder_name))
     except Exception as e:
-        pass
+        print(e)
 
 
 def remove_directory(target_folder_name, parent_directory):
@@ -77,9 +71,10 @@ def remove_directory(target_folder_name, parent_directory):
         os.rmdir(path)
         print('DIRECTORY \"{}\" removed'.format(target_folder_name))
     except Exception as e:
-        # print(e)
+        print(e)
         path = os.path.join(parent_directory, target_folder_name)
         shutil.rmtree(path)
+
 
 class Client:
     def __init__(self):
@@ -143,6 +138,25 @@ class Client:
         client.send(message_length)
         client.send(message)
 
+    def print_commits(self, commits, old, new):
+        print(' * USERNAME  : {}\n'
+              ' | REPOSITORY: {}\n'
+              ' | MESSAGE   : {}\n'
+              ' | TIME      : {}'.format(self.username, commits[0][0],commits[0][3], commits[0][4]))
+        print(' | FILES')
+        for c in commits:
+            print(' |-', Fore.CYAN, c[1], Fore.WHITE)
+        print(' | DIFFERENCES FROM LAST COMMIT')
+        green = new - old
+        yellow = new & old
+        red = old - new
+        for g in green:
+            print(' |-', Fore.GREEN, '[+]', g[0], Fore.WHITE)
+        for y in yellow:
+            print(' |-', Fore.YELLOW, '[*]', y[0], Fore.WHITE)
+        for r in red:
+            print(' |-', Fore.RED, '[-]', r[0], Fore.WHITE)
+
     def manage_repository(self, s,  repo, repo_dir):
         while True:
             try:
@@ -185,10 +199,10 @@ class Client:
                         cur.execute("SELECT * FROM {} WHERE commit_time = \'{}\'".format('commits', time))
                         new_commits = cur.fetchall()
 
-                        print('\nNEWLY ADDED FILES TO DATABASE FROM THE LAST COMMIT:')
-                        print_commits(new_commits)
+                        # print('\nNEWLY ADDED FILES TO DATABASE FROM THE LAST COMMIT:')
 
-                        print('\nSHOW DIFFERENCES BETWEEN THIS COMMIT AND THE ONE BEFORE:')
+
+                        # print('\nSHOW DIFFERENCES BETWEEN THIS COMMIT AND THE ONE BEFORE:')
                         # get times
                         cur = self.conn_db.cursor()
                         cur.execute("SELECT DISTINCT commit_time FROM {} ORDER BY commit_time".format('commits'))
@@ -204,19 +218,8 @@ class Client:
                         cur.execute("SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-2][0]))
                         before_last_commit = set(cur.fetchall())
 
-                        green = last_commit - before_last_commit
-                        yellow = last_commit & before_last_commit
-                        red = before_last_commit - last_commit
-
-                        for g in green:
-                            print(Fore.GREEN, '[+]', g[0], Fore.WHITE)
-
-                        for y in yellow:
-                            print(Fore.YELLOW, '[*]', y[0], Fore.WHITE)
-
-                        for r in red:
-                            print(Fore.RED, '[-]', r[0], Fore.WHITE)
-
+                        # self.print_commifs_diff(old=before_last_commit, new=last_commit)
+                        self.print_commits(commits=new_commits, old=before_last_commit, new=last_commit)
 
                     else:
                         print(Fore.RED, 'CANCELED!', Fore.WHITE)
@@ -234,7 +237,6 @@ class Client:
                             self.username, repo, file_name, file_size, file_content.read())
                         self.send_message(s, msg)
                         self.receive_message_from_server(s, print_it=True)
-
 
                 # pull
                 elif option == 3:
@@ -271,16 +273,27 @@ class Client:
                             print(Fore.RED, 'bad input! try again', Fore.WHITE)
                             print(e)
 
+                # show all commits local
                 elif option == 5:
                     cur = self.conn_db.cursor()
                     cur.execute("SELECT DISTINCT commit_time FROM {} ORDER BY commit_time".format('commits'))
                     times = cur.fetchall()
+                    file_names = []
 
-                    for t in times:
+                    for c in range(len(times)):
                         cur = self.conn_db.cursor()
-                        cur.execute("SELECT * FROM {} WHERE commit_time = \'{}\'".format('commits', t[0]))
-                        print_commits(cur.fetchall())
+                        cur.execute("SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[c][0]))
+                        file_names.append(set(cur.fetchall()))
 
+                    for c in range(len(times)):
+                        cur = self.conn_db.cursor()
+                        cur.execute("SELECT * FROM {} WHERE commit_time = \'{}\'".format('commits', times[c][0]))
+                        cc = cur.fetchall()
+                        if c == 0:
+                            self.print_commits(commits=cc, old=set([]), new=file_names[c])
+                        else:
+                            self.print_commits(commits=cc, old=file_names[c - 1], new=file_names[c])
+                        print()
             except Exception as e:
                 print(e)
 
