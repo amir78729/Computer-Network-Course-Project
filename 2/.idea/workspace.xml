@@ -2,18 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1a122ee9-44fd-44c9-a16d-16ab3c1f5f96" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/11/python.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/11/New Text Document - Copy - Copy (2).txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/11/New Text Document - Copy - Copy.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/Client.py" beforeDir="false" afterPath="$PROJECT_DIR$/CLIENT_ROOT/Client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GIT/1/11/python.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server.py" beforeDir="false" afterPath="$PROJECT_DIR$/Server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/directiry_management_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/directiry_management_functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_info.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_password.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/users.db" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/users.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/client_database.sql" beforeDir="false" afterPath="$PROJECT_DIR$/CLIENT_ROOT/client_database.sql" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -52,8 +44,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/CLIENT_ROOT/Client.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="393">
-              <caret line="217" column="47" selection-start-line="217" selection-start-column="47" selection-end-line="217" selection-end-column="47" />
+            <state relative-caret-position="173">
+              <caret line="194" column="65" lean-forward="true" selection-start-line="194" selection-start-column="65" selection-end-line="194" selection-end-column="65" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -326,12 +318,12 @@
       <workItem from="1620575605681" duration="34741000" />
       <workItem from="1620943468506" duration="9043000" />
       <workItem from="1620982665940" duration="3865000" />
-      <workItem from="1621103599398" duration="11886000" />
+      <workItem from="1621103599398" duration="12798000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="117667000" />
+    <option name="totallyTimeSpent" value="118579000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
@@ -436,8 +428,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/CLIENT_ROOT/Client.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="393">
-          <caret line="217" column="47" selection-start-line="217" selection-start-column="47" selection-end-line="217" selection-end-column="47" />
+        <state relative-caret-position="173">
+          <caret line="194" column="65" lean-forward="true" selection-start-line="194" selection-start-column="65" selection-end-line="194" selection-end-column="65" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>

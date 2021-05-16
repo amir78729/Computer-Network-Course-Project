@@ -185,7 +185,7 @@ class Client:
                         cur.execute("SELECT * FROM {} WHERE commit_time = \'{}\'".format('commits', time))
                         new_commits = cur.fetchall()
 
-                        print('NEWLY ADDED FILES TO DATABASE FROM THE LAST COMMIT:')
+                        print('\nNEWLY ADDED FILES TO DATABASE FROM THE LAST COMMIT:')
                         print_commits(new_commits)
 
                         print('\nSHOW DIFFERENCES BETWEEN THIS COMMIT AND THE ONE BEFORE:')
@@ -206,6 +206,17 @@ class Client:
 
                         green = last_commit - before_last_commit
                         yellow = last_commit & before_last_commit
+                        red = before_last_commit - last_commit
+
+                        for g in green:
+                            print(Fore.GREEN, '[+]', g[0], Fore.WHITE)
+
+                        for y in yellow:
+                            print(Fore.YELLOW, '[*]', y[0], Fore.WHITE)
+
+                        for r in red:
+                            print(Fore.RED, '[-]', r[0], Fore.WHITE)
+
 
                     else:
                         print(Fore.RED, 'CANCELED!', Fore.WHITE)
