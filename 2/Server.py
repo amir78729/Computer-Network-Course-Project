@@ -50,12 +50,13 @@ class Server:
 
         # user commits table
         create_user_table_query = """ CREATE TABLE IF NOT EXISTS users_commits (
-                                                            username text,
-                                                            repo_name text,
-                                                            path text,
-                                                            message text, 
-                                                            CONSTRAINT PK_user PRIMARY KEY (username,repo_name, message)
-                                                        ); """
+                                                                        repository text,
+                                                                        file_path text,
+                                                                        file_content text,
+                                                                        message text, 
+                                                                        commit_time text, 
+                                                                        CONSTRAINT PK_commit PRIMARY KEY (file_path, commit_time)
+                                                                    ); """
         if self.conn_db is not None:
             create_table(self.conn_db, create_user_table_query)
         else:
@@ -193,27 +194,28 @@ class Server:
                 # push
                 # TODO : create a table in database
                 elif command == 'push':
-                    username = received_message[1]
-                    repo = received_message[2]
-                    file_name = received_message[3]
-                    file_size = received_message[4]
-                    file_content = received_message[5]
-                    print('\tUSERNAME:\t{}'.format(username))
-                    print('\tREPO.   :\t{}'.format(repo))
-                    print('\tF.NAME  :\t{}'.format(file_name))
-                    print('\tF.SIZE  :\t{}'.format(file_size))
-                    try:
-                        path = os.path.join(self.WORKING_DIRECTORY, username)
-                        path = os.path.join(path, repo)
-                        os.chdir(path)
-                        file = open(file_name, 'w')
-                        file.write(file_content)
-                        self.send_message_to_client(c, 'FILE {} IS PUSHED TO SERVER'.format(file_name))
-                        file.close()
-                        print('\tstatus  :\tsuccessful'.upper())
-                    except Exception as e:
-                        print('\tSTATUS  :\t{}'.format(e))
-                        self.send_message_to_client(c, '!!! ERROR FOR PUSHING {}'.format(file_name))
+                    pass
+                    # username = received_message[1]
+                    # repo = received_message[2]
+                    # file_name = received_message[3]
+                    # file_size = received_message[4]
+                    # file_content = received_message[5]
+                    # print('\tUSERNAME:\t{}'.format(username))
+                    # print('\tREPO.   :\t{}'.format(repo))
+                    # print('\tF.NAME  :\t{}'.format(file_name))
+                    # print('\tF.SIZE  :\t{}'.format(file_size))
+                    # try:
+                    #     path = os.path.join(self.WORKING_DIRECTORY, username)
+                    #     path = os.path.join(path, repo)
+                    #     os.chdir(path)
+                    #     file = open(file_name, 'w')
+                    #     file.write(file_content)
+                    #     self.send_message_to_client(c, 'FILE {} IS PUSHED TO SERVER'.format(file_name))
+                    #     file.close()
+                    #     print('\tstatus  :\tsuccessful'.upper())
+                    # except Exception as e:
+                    #     print('\tSTATUS  :\t{}'.format(e))
+                    #     self.send_message_to_client(c, '!!! ERROR FOR PUSHING {}'.format(file_name))
 
 
                 # show all users

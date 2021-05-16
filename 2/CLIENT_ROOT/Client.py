@@ -138,11 +138,31 @@ class Client:
         client.send(message_length)
         client.send(message)
 
+    def commit(self, files, repo, message, time):
+        if not files:
+            insert_into_table(self.conn_db, 'commits',
+                              'repository, file_path, file_content, message, commit_time',
+                              (repo, '', '', message, time))
+
+        for file_name in files:
+            file_content = open(file_name, 'r')
+            path = os.path.relpath(file_name)
+
+            # insert commit tp database
+            insert_into_table(self.conn_db, 'commits',
+                              'repository, file_path, file_content, message, commit_time',
+                              (repo, path, file_content.read(), message, time))
+        print('FILES ARE ADDED TO LOCAL DATABASE.')
+
     def print_commits(self, commits, old, new):
         print(' * USERNAME  : {}\n'
               ' | REPOSITORY: {}\n'
               ' | MESSAGE   : {}\n'
-              ' | TIME      : {}'.format(self.username, commits[0][0],commits[0][3], commits[0][4]))
+              ' | TIME      : {}'.format(self.username, commits[0][0], commits[0][3], commits[0][4]))
+        # print(' | USERNAME  :', self.username)
+        # print(' | REPOSITORY:', commits[0][0])
+        # print(' | MESSAGE   :', commits[0][3])
+        # print(' | TIME      :', commits[0][4])
         print(' | FILES')
         for c in commits:
             print(' |-', Fore.CYAN, c[1], Fore.WHITE)
@@ -185,41 +205,42 @@ class Client:
                     if message != '-1':
                         commit_it = True
                     if commit_it:
-                        for file_name in files:
-                            file_content = open(file_name, 'r')
-                            path = os.path.relpath(file_name)
-
-                            # insert commit tp database
-                            insert_into_table(self.conn_db, 'commits',
-                                              'repository, file_path, file_content, message, commit_time',
-                                              (repo, path, file_content.read(), message, time))
-                        print('FILES ARE ADDED TO LOCAL DATABASE.')
-
+                        self.commit(files, repo, message, time)
+                        print('hi')
                         cur = self.conn_db.cursor()
                         cur.execute("SELECT * FROM {} WHERE commit_time = \'{}\'".format('commits', time))
                         new_commits = cur.fetchall()
 
                         # print('\nNEWLY ADDED FILES TO DATABASE FROM THE LAST COMMIT:')
 
-
                         # print('\nSHOW DIFFERENCES BETWEEN THIS COMMIT AND THE ONE BEFORE:')
                         # get times
                         cur = self.conn_db.cursor()
                         cur.execute("SELECT DISTINCT commit_time FROM {} ORDER BY commit_time".format('commits'))
                         times = cur.fetchall()
-
+                        print('hi')
                         # new commit
                         cur = self.conn_db.cursor()
-                        cur.execute("SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-1][0]))
-                        last_commit = set(cur.fetchall())
+                        try:
+                            cur.execute(
+                                "SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-1][0]))
+                            last_commit = set(cur.fetchall())
+                        except :
+                            last_commit = set([])
 
                         # last commit
                         cur = self.conn_db.cursor()
-                        cur.execute("SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-2][0]))
-                        before_last_commit = set(cur.fetchall())
-
+                        print('hi')
+                        try:
+                            cur.execute(
+                                "SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-2][0]))
+                            before_last_commit = set(cur.fetchall())
+                        except :
+                            before_last_commit = set([])
+                        print('hi')
                         # self.print_commifs_diff(old=before_last_commit, new=last_commit)
                         self.print_commits(commits=new_commits, old=before_last_commit, new=last_commit)
+
 
                     else:
                         print(Fore.RED, 'CANCELED!', Fore.WHITE)
@@ -227,16 +248,17 @@ class Client:
                 # TODO send from database not local
                 # push
                 elif option == 2:
-                    files = os.listdir(self.current_directory)
-                    for file_name in files:
-                        file_content = open(file_name, 'r')
-                        path = os.path.abspath(file_name)
-                        file_size = os.path.getsize(os.path.join(self.current_directory, file_name))
-                        print('FILE NAME: {}\nABSOLUTE PATH: {}\nSIZE: {}'.format(file_name, path, file_size))
-                        msg = 'push`{}`{}`{}`{}`{}'.format(
-                            self.username, repo, file_name, file_size, file_content.read())
-                        self.send_message(s, msg)
-                        self.receive_message_from_server(s, print_it=True)
+                    pass
+                    # files = os.listdir(self.current_directory)
+                    # for file_name in files:
+                    #     file_content = open(file_name, 'r')
+                    #     path = os.path.abspath(file_name)
+                    #     file_size = os.path.getsize(os.path.join(self.current_directory, file_name))
+                    #     print('FILE NAME: {}\nABSOLUTE PATH: {}\nSIZE: {}'.format(file_name, path, file_size))
+                    #     msg = 'push`{}`{}`{}`{}`{}'.format(
+                    #         self.username, repo, file_name, file_size, file_content.read())
+                    #     self.send_message(s, msg)
+                    #     self.receive_message_from_server(s, print_it=True)
 
                 # pull
                 elif option == 3:
