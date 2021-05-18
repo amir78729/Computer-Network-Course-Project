@@ -8,6 +8,7 @@ import sqlite3
 from sqlite3 import Error
 from tqdm import tqdm
 
+
 def copy_directory(src, dst):
     shutil.copytree(src, dst, copy_function=shutil.copy)
 
@@ -144,7 +145,7 @@ class Client:
                               'repository, file_path, file_content, message, commit_time',
                               (repo, '', '', message, time))
 
-        for file_name in files:
+        for file_name in tqdm(files, desc="COMMITTING FILES"):
             file_content = open(file_name, 'r')
             path = os.path.relpath(file_name)
 
@@ -186,7 +187,7 @@ class Client:
                 option = int(input('please select an option\n'
                                    ' 1 - commit\n'
                                    ' 2 - push to server\n'
-                                   ' 3 - pull from server\n'
+                                   ' 3 - pull this repository from server\n'
                                    ' 4 - add contributor\n'
                                    ' 5 - show all pending commits (local)\n'
                                    '-1 - back to menu\n'
@@ -218,12 +219,14 @@ class Client:
                         cur = self.conn_db.cursor()
                         cur.execute(
                             "SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-1][0]))
+                        # print(cur.fetchall())
                         last_commit = set(cur.fetchall())
 
                         # last commit
                         cur = self.conn_db.cursor()
                         cur.execute(
                             "SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-2][0]))
+                        # print(cur.fetchall())
                         before_last_commit = set(cur.fetchall())
                         # self.print_commifs_diff(old=before_last_commit, new=last_commit)
                         self.print_commits(commits=new_commits, old=before_last_commit, new=last_commit)
@@ -238,36 +241,38 @@ class Client:
                     cur = self.conn_db.cursor()
                     cur.execute("SELECT * FROM {} WHERE repository = \'{}\'".format('commits', repo))
                     commits = cur.fetchall()
-                    for commit in tqdm(commits, desc="SENDING COMMITS TO SERVER'S DATABASE"):
-                        msg = 'commit`{}`{}`{}`{}`{}`{}'.format(self.username,
-                                                                commit[0],
-                                                                commit[1],
-                                                                commit[2],
-                                                                commit[3],
-                                                                commit[4])
+                    if commits:
+                        # print(Fore.GREEN, end='')
+                        for commit in tqdm(commits, desc="SENDING COMMITS TO SERVER'S DATABASE"):
+                            msg = 'commit`{}`{}`{}`{}`{}`{}'.format(self.username,
+                                                                    commit[0],
+                                                                    commit[1],
+                                                                    commit[2],
+                                                                    commit[3],
+                                                                    commit[4])
+                            self.send_message(s, msg)
+                            self.receive_message_from_server(s, print_it=False)
+
+                        # push last commit contents to the server
+                        cur = self.conn_db.cursor()
+                        cur.execute("SELECT DISTINCT commit_time FROM {} ORDER BY commit_time".format('commits'))
+                        last_commit_time = cur.fetchall()[-1]
+
+                        msg = 'push`{}`{}`{}'.format(self.username, repo, last_commit_time[0])
                         self.send_message(s, msg)
-                        self.receive_message_from_server(s, print_it=False)
+                        n = self.receive_message_from_server(s, print_it=False)
+                        for i in tqdm(range(int(n)), desc='PUSH TO SERVER DIRECTORIES'):
+                            self.receive_message_from_server(s, print_it=False)
 
-                    # push last commit contents to the server
-                    cur = self.conn_db.cursor()
-                    cur.execute("SELECT DISTINCT commit_time FROM {} ORDER BY commit_time".format('commits'))
-                    last_commit_time = cur.fetchall()[-1]
-
-                    msg = 'push`{}`{}`{}'.format(self.username, repo, last_commit_time[0])
-                    self.send_message(s, msg)
-
-                    pass
-                    # files = os.listdir(self.current_directory)
-                    # for file_name in files:
-                    #     file_content = open(file_name, 'r')
-                    #     path = os.path.abspath(file_name)
-                    #     file_size = os.path.getsize(os.path.join(self.current_directory, file_name))
-                    #     print('FILE NAME: {}\nABSOLUTE PATH: {}\nSIZE: {}'.format(file_name, path, file_size))
-                    #     msg = 'push`{}`{}`{}`{}`{}'.format(
-                    #         self.username, repo, file_name, file_size, file_content.read())
-                    #     self.send_message(s, msg)
-                    #     self.receive_message_from_server(s, print_it=True)
-
+                        # clear local database for this repositories' commits
+                        sql = "DELETE FROM commits where repository = \'{}\'".format(repo)
+                        cur = self.conn_db.cursor()
+                        cur.execute(sql)
+                        self.conn_db.commit()
+                        print('RECORDS FOR REPOSITORY \"{}\" REMOVED FROM LOCAL DATABASE'.format(repo))
+                        print(Fore.WHITE, end='')
+                    else:
+                        print(Fore.RED, 'NO COMMITS FOUNDED!', Fore.WHITE)
                 # pull
                 elif option == 3:
                     pass
@@ -325,7 +330,10 @@ class Client:
                             self.print_commits(commits=cc, old=file_names[c - 1], new=file_names[c])
                         print()
             except Exception as e:
-                print(e)
+                if e == 'list index out of range':
+                    pass
+                else:
+                    print(e)
 
     def main(self):
         # global username
@@ -397,6 +405,7 @@ class Client:
                                        ' 5 - select repository\n'
                                        ' 6 - update password\n'
                                        ' 7 - delete user\n'
+                                       ' 8 - pull a repository\n'
                                        '-1 - disconnect from server\n'
                                        ' > '.upper()))
 
@@ -505,7 +514,40 @@ class Client:
                             self.send_message(s, msg)
                             self.receive_message_from_server(s, print_it=True)
                             s.close()
+
+                            # clear local database
+                            sql = 'DELETE FROM commits'
+                            cur = self.conn_db.cursor()
+                            cur.execute(sql)
+                            self.conn_db.commit()
+
                             break  # end of program
+
+                    # pull a repository from main menu
+                    elif option == 8:
+                        msg = 'show-repo-all`{}'.format(self.username)
+                        self.send_message(s, msg)
+                        n = int(self.receive_message_from_server(s, print_it=False))
+                        for i in range(n):
+                            self.receive_message_from_server(s, print_it=True)
+
+                        choice = int(input('select a repository (-1 to cancel)'.upper()))
+                        if choice == -1:
+                            print(Fore.RED, 'CANCELED!', Fore.WHITE)
+                        else:
+                            msg = 'pull-a-repo`{}`{}'.format(self.username, choice)
+                            self.send_message(s, msg)
+                            n = int(self.receive_message_from_server(s, print_it=False))
+                            for i in tqdm(range(n), desc='PULL FROM SERVER'):
+                                repo, path, data = self.receive_message_from_server(s, print_it=True).split('`')
+                                make_directory(repo, self.ROOT_PATH)
+                                parent = os.path.join(self.ROOT_PATH, repo)
+                                os.chdir(parent)
+                                file = open(path, 'w')
+                                file.write(data)
+                                print(Fore.YELLOW, '{} IS PULLED FROM SERVER.'.format(path), Fore.WHITE)
+                                file.close()
+
                     # cls()
                 except ValueError:
                     print(Fore.RED, 'bad input! try again', Fore.WHITE)

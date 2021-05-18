@@ -20,7 +20,6 @@ class Server:
         make_directory(self.ROOT_PATH, self.WORKING_DIRECTORY)
         self.WORKING_DIRECTORY = os.path.join(self.WORKING_DIRECTORY, self.ROOT_PATH)
 
-
         # connecting to the database
         git_database = "server_database.sql"
         self.conn_db = create_connection(git_database)
@@ -68,7 +67,7 @@ class Server:
         print('\tnumber of active users: {}'.format(len(self.active_users)).upper())
         [print('\t\t- {}'.format(i)) for i in self.active_users]
 
-    def add_user(self, c,  username, password):
+    def add_user(self, c, username, password):
         insert_into_table(self.conn_db, 'users_passwords', 'username, password', (username, password))
         self.send_message_to_client(c, 'user created successfully'.upper())
         print('\tstatus  :\tsuccessful'.upper())
@@ -188,7 +187,7 @@ class Server:
                     repositories = os.listdir(os.path.join(self.WORKING_DIRECTORY, username))
                     self.send_message_to_client(c, str(len(repositories)))
                     for repo in repositories:
-                        self.send_message_to_client(c, '   - '+repo)
+                        self.send_message_to_client(c, '   - ' + repo)
 
                 # get commits from users database and add to server commit table TODO db insert is not working
                 elif command == 'commit':
@@ -217,21 +216,46 @@ class Server:
                     repo = received_message[2]
                     last_commit_time = received_message[3]
 
-                    print(username, repo, last_commit_time)
+                    # print(username, repo, last_commit_time)
 
                     cur = self.conn_db.cursor()
-                    q = "SELECT * FROM {} WHERE repository = \'{}\' and commit_time = \'{}\' and username = \'{}\'"\
+                    q = "SELECT * FROM {} WHERE repository = \'{}\' and commit_time = \'{}\' and username = \'{}\'" \
                         .format('users_commits', repo, last_commit_time, username)
 
-                    q = "SELECT * FROM {} WHERE commit_time = \'{}\'" \
-                        .format('users_commits', last_commit_time)
-
-                    q = "SELECT * FROM {}" \
-                        .format('users_commits')
-                    print(q)
                     cur.execute(q)
                     files = cur.fetchall()
-                    print(files)
+                    self.send_message_to_client(c, str(len(files)))
+
+                    parent_path = os.path.join(self.WORKING_DIRECTORY, username)
+                    parent_path = os.path.join(parent_path, repo)
+                    os.chdir(parent_path)
+                    # shutil.rmtree(parent_path)
+                    children = os.listdir(parent_path)
+                    # print(children)
+                    # for c in children:
+                    #     os.remove(c)
+
+                    print('\tSTATUS  :\t')
+                    for f in files:
+                        try:
+                            parent_path = os.path.join(self.WORKING_DIRECTORY, username)
+                            parent_path = os.path.join(parent_path, repo)
+                            os.chdir(parent_path)
+                            # shutil.rmtree(parent_path)
+                            # children = os.listdir(parent_path)
+                            # print(children)
+                            # for c in children:
+                            #     os.remove(c)
+
+                            file = open(f[2], 'w')
+                            file.write(f[3])
+                            self.send_message_to_client(c, 'FILE {} IS PUSHED TO SERVER'.format(f[2]))
+                            print('\t         \t{} PUSHED SUCCESSFULLY'.format(f[2]))
+                            # print('\t         \tCONTENT: {}'.format(f[3]))
+                            file.close()
+                        except Exception as e:
+                            print('\t         \t{}'.format(e))
+                            self.send_message_to_client(c, '!!! ERROR FOR PUSHING {}'.format(f[2]))
 
                     # try:
                     #     path = os.path.join(self.WORKING_DIRECTORY, username)
@@ -303,7 +327,8 @@ class Server:
                         contributor = users[int(choice_of_client) - 1][0]
 
                         cur = self.conn_db.cursor()
-                        cur.execute("SELECT contributor FROM users_repositories WHERE username=? and repo_name=?", (username,target_repo))
+                        cur.execute("SELECT contributor FROM users_repositories WHERE username=? and repo_name=?",
+                                    (username, target_repo))
                         old_contributor = cur.fetchall()[0][0]
 
                         new_contributor = old_contributor + " " + contributor
@@ -333,19 +358,62 @@ class Server:
                             repositories.remove(r)
 
                     self.send_message_to_client(c, str(len(repositories)))
+                    i = 1
                     for r in repositories:
                         u_name, repo_name, p, collabs = r[0], r[1], r[2], r[3].split()
                         if p == 'PRVT':
                             p = 'PRIVATE'
                         else:
                             p = 'PUBLIC'
-                        record = '   - NAME: \"{}\"\n     PRVT/PBLC: {}\n     CONTRIBUTOR: {} \n'.format(repo_name, p, collabs)
+                        record = '   {} - NAME: \"{}\"\n     PRVT/PBLC: {}\n     CONTRIBUTOR: {} \n'.format(i,
+                                                                                                            repo_name,
+                                                                                                            p, collabs)
                         self.send_message_to_client(c, record)
-
+                        i += 1
 
                     # self.send_message_to_client(c, str(len(repositories)))
                     # for repo in repositories:
                     #     self.send_message_to_client(c, '    - '+repo)
+
+                # pull a repository from main menu
+                elif command == 'pull-a-repo':
+                    username = received_message[1]
+                    index = int(received_message[2])
+
+                    repositories = list(get_table(self.conn_db, 'users_repositories'))
+
+                    # filter the repositories for user (hide PRIVATE repositories if user is not a collaborator)
+                    for r in repositories:
+                        u_name, repo_name, p, collabs = r[0], r[1], r[2], r[3].split()
+                        if p == 'PRVT' and username not in collabs:
+                            repositories.remove(r)
+                    selected_repo = repositories[index - 1]
+                    u_name, repo_name = selected_repo[0], selected_repo[1]
+                    cur = self.conn_db.cursor()
+                    # q = "SELECT commit_time FROM {} WHERE repository = \'{}\' and username = \'{}\' ORDER BY commit_time" \
+                    #     .format('users_commits', repo_name, username)
+
+                    q = "SELECT commit_time from users_commits WHERE repository = \'{}\' and username = \'{}\'"\
+                        .format(repo_name, u_name)
+                    cur.execute(q)
+                    times = cur.fetchall()
+                    tt = []
+                    for t in times:
+                        tt.append(t[0])
+
+                    last_push_time = max(tt)
+
+                    cur = self.conn_db.cursor()
+                    q = "SELECT * FROM {} WHERE commit_time = \'{}\'" \
+                        .format('users_commits', last_push_time)
+                    cur.execute(q)
+                    pull_list = cur.fetchall()
+                    self.send_message_to_client(c, str(len(pull_list)))
+                    for p in pull_list:
+                        record = '{}`{}`{}'.format(p[1], p[2], p[3])
+                        self.send_message_to_client(c, record)
+
+
 
                 # disconnecting
                 elif command == 'disconnect':
