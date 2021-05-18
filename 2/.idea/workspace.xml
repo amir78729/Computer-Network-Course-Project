@@ -2,18 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1a122ee9-44fd-44c9-a16d-16ab3c1f5f96" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/11/asd - Copy (2).txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/11/asd - Copy (3).txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/11/asd - Copy (4).txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/11/asd - Copy.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/11/asd.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/Client.py" beforeDir="false" afterPath="$PROJECT_DIR$/CLIENT_ROOT/Client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/client_database.sql" beforeDir="false" afterPath="$PROJECT_DIR$/CLIENT_ROOT/client_database.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GIT/1/11/New Text Document.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Server.py" beforeDir="false" afterPath="$PROJECT_DIR$/Server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server_database.sql" beforeDir="false" afterPath="$PROJECT_DIR$/server_database.sql" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -37,11 +28,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="58">
-              <caret line="377" column="16" lean-forward="true" selection-start-line="377" selection-start-column="16" selection-end-line="377" selection-end-column="16" />
+            <state relative-caret-position="178">
+              <caret line="399" column="38" selection-start-line="399" selection-start-column="29" selection-end-line="399" selection-end-column="38" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -49,11 +40,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/CLIENT_ROOT/Client.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="205">
-              <caret line="525" column="20" lean-forward="true" selection-start-line="525" selection-start-column="20" selection-end-line="525" selection-end-column="54" />
+            <state relative-caret-position="170">
+              <caret line="58" lean-forward="true" selection-start-line="58" selection-end-line="58" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -64,8 +55,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/database_functions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="123">
-              <caret line="168" column="33" selection-start-line="165" selection-start-column="6" selection-end-line="168" selection-end-column="33" />
+            <state relative-caret-position="500">
+              <caret line="168" column="12" selection-start-line="165" selection-start-column="6" selection-end-line="168" selection-end-column="33" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -103,7 +94,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>self.conn_user_password</find>
       <find>add_repo</find>
       <find>COLLABORATORS</find>
       <find>users_info</find>
@@ -133,6 +123,7 @@
       <find>canceled</find>
       <find>commit_time</find>
       <find>int</find>
+      <find>repo_nam</find>
     </findStrings>
     <replaceStrings>
       <replace>delete_user_from_database</replace>
@@ -163,8 +154,8 @@
         <option value="$PROJECT_DIR$/directiry_management_functions.py" />
         <option value="$PROJECT_DIR$/database_functions.py" />
         <option value="$PROJECT_DIR$/server_database.sql" />
-        <option value="$PROJECT_DIR$/CLIENT_ROOT/Client.py" />
         <option value="$PROJECT_DIR$/Server.py" />
+        <option value="$PROJECT_DIR$/CLIENT_ROOT/Client.py" />
       </list>
     </option>
   </component>
@@ -335,12 +326,12 @@
       <workItem from="1620943468506" duration="9043000" />
       <workItem from="1620982665940" duration="3865000" />
       <workItem from="1621103599398" duration="29190000" />
-      <workItem from="1621331485882" duration="25365000" />
+      <workItem from="1621331485882" duration="26218000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="160336000" />
+    <option name="totallyTimeSpent" value="161189000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
@@ -351,7 +342,7 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32978722" />
-      <window_info active="true" anchor="bottom" x="22" y="247" width="1237" height="186" id="Run" order="2" visible="true" weight="0.3173759" />
+      <window_info active="true" anchor="bottom" x="22" y="247" width="1237" height="186" id="Run" order="2" visible="true" weight="0.18439716" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -375,7 +366,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/2$Client.coverage" NAME="Client Coverage Results" MODIFIED="1620596027726" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/2$main.coverage" NAME="main Coverage Results" MODIFIED="1619128379669" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/2$Server.coverage" NAME="Server Coverage Results" MODIFIED="1621375213958" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/2$Server.coverage" NAME="Server Coverage Results" MODIFIED="1621376618823" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/2$Client___.coverage" NAME="Client (۱) Coverage Results" MODIFIED="1620596276118" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/CLIENT_ROOT" />
   </component>
   <component name="editorHistoryManager">
@@ -420,28 +411,28 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/database_functions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="123">
-          <caret line="168" column="33" selection-start-line="165" selection-start-column="6" selection-end-line="168" selection-end-column="33" />
+        <state relative-caret-position="500">
+          <caret line="168" column="12" selection-start-line="165" selection-start-column="6" selection-end-line="168" selection-end-column="33" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CLIENT_ROOT/Client.py">
+    <entry file="file://$PROJECT_DIR$/Server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="205">
-          <caret line="525" column="20" lean-forward="true" selection-start-line="525" selection-start-column="20" selection-end-line="525" selection-end-column="54" />
+        <state relative-caret-position="178">
+          <caret line="399" column="38" selection-start-line="399" selection-start-column="29" selection-end-line="399" selection-end-column="38" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Server.py">
+    <entry file="file://$PROJECT_DIR$/CLIENT_ROOT/Client.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="58">
-          <caret line="377" column="16" lean-forward="true" selection-start-line="377" selection-start-column="16" selection-end-line="377" selection-end-column="16" />
+        <state relative-caret-position="170">
+          <caret line="58" lean-forward="true" selection-start-line="58" selection-end-line="58" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>

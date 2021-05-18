@@ -63,7 +63,8 @@ def make_directory(new_folder_name, parent_directory):
         os.mkdir(path)
         print('DIRECTORY \"{}\" CREATED'.format(new_folder_name))
     except Exception as e:
-        print(e)
+        # print(e)
+        pass
 
 
 def remove_directory(target_folder_name, parent_directory):
@@ -275,7 +276,18 @@ class Client:
                         print(Fore.RED, 'NO COMMITS FOUNDED!', Fore.WHITE)
                 # pull
                 elif option == 3:
-                    pass
+                    msg = 'pull-my-repo`{}`{}'.format(self.username, repo)
+                    self.send_message(s, msg)
+                    n = int(self.receive_message_from_server(s, print_it=False))
+                    for i in tqdm(range(n), desc='PULL FROM SERVER'):
+                        repo, path, data = self.receive_message_from_server(s, print_it=True).split('`')
+                        # make_directory(repo, self.ROOT_PATH)
+                        parent = os.path.join(self.ROOT_PATH, repo)
+                        os.chdir(parent)
+                        file = open(path, 'w')
+                        file.write(data)
+                        print(Fore.YELLOW, '{} IS PULLED FROM SERVER.'.format(path), Fore.WHITE)
+                        file.close()
 
                 # add contributor
                 elif option == 4:

@@ -375,6 +375,34 @@ class Server:
                     # for repo in repositories:
                     #     self.send_message_to_client(c, '    - '+repo)
 
+                # pull a specific repository
+                elif command == 'pull-my-repo':
+                    username = received_message[1]
+                    repo = received_message[2]
+
+                    cur = self.conn_db.cursor()
+                    q = "SELECT commit_time from users_commits WHERE repository = \'{}\' and username = \'{}\'" \
+                        .format(repo, username)
+                    cur.execute(q)
+                    times = cur.fetchall()
+                    tt = []
+                    for t in times:
+                        tt.append(t[0])
+
+                    last_push_time = max(tt)
+
+                    cur = self.conn_db.cursor()
+                    q = "SELECT * FROM {} WHERE commit_time = \'{}\'" \
+                        .format('users_commits', last_push_time)
+                    cur.execute(q)
+                    pull_list = cur.fetchall()
+                    self.send_message_to_client(c, str(len(pull_list)))
+                    for p in pull_list:
+                        record = '{}`{}`{}'.format(p[1], p[2], p[3])
+                        print('\tstatus  :\tPULLING \"{}\"'.format(p[2]))
+                        self.send_message_to_client(c, record)
+
+
                 # pull a repository from main menu
                 elif command == 'pull-a-repo':
                     username = received_message[1]
@@ -390,8 +418,6 @@ class Server:
                     selected_repo = repositories[index - 1]
                     u_name, repo_name = selected_repo[0], selected_repo[1]
                     cur = self.conn_db.cursor()
-                    # q = "SELECT commit_time FROM {} WHERE repository = \'{}\' and username = \'{}\' ORDER BY commit_time" \
-                    #     .format('users_commits', repo_name, username)
 
                     q = "SELECT commit_time from users_commits WHERE repository = \'{}\' and username = \'{}\'"\
                         .format(repo_name, u_name)
@@ -411,9 +437,8 @@ class Server:
                     self.send_message_to_client(c, str(len(pull_list)))
                     for p in pull_list:
                         record = '{}`{}`{}'.format(p[1], p[2], p[3])
+                        print('\tstatus  :\tPULLING \"{}\"'.format(p[2]))
                         self.send_message_to_client(c, record)
-
-
 
                 # disconnecting
                 elif command == 'disconnect':
@@ -426,7 +451,7 @@ class Server:
                     username = received_message[1]
                     new_password = received_message[2]
                     self.update_password(username, new_password)
-                    print('\tstatus  :\tPASSWORD SUCCESSFULLY UPDATED FOR USER \"{}\"'.format(username))
+                    print('\tSTATUS  :\tPASSWORD SUCCESSFULLY UPDATED FOR USER \"{}\"'.format(username))
                     self.send_message_to_client(c, 'password changed successfully'.upper())
 
                 # wrong input
