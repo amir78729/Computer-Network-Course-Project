@@ -274,20 +274,23 @@ class Client:
                         print(Fore.WHITE, end='')
                     else:
                         print(Fore.RED, 'NO COMMITS FOUNDED!', Fore.WHITE)
+
                 # pull
                 elif option == 3:
                     msg = 'pull-my-repo`{}`{}'.format(self.username, repo)
                     self.send_message(s, msg)
                     n = int(self.receive_message_from_server(s, print_it=False))
+                    print(Fore.YELLOW)
                     for i in tqdm(range(n), desc='PULL FROM SERVER'):
-                        repo, path, data = self.receive_message_from_server(s, print_it=True).split('`')
+                        repo, path, data = self.receive_message_from_server(s, print_it=False).split('`')
                         # make_directory(repo, self.ROOT_PATH)
                         parent = os.path.join(self.ROOT_PATH, repo)
                         os.chdir(parent)
                         file = open(path, 'w')
                         file.write(data)
-                        print(Fore.YELLOW, '{} IS PULLED FROM SERVER.'.format(path), Fore.WHITE)
+                        # print(Fore.YELLOW, '{} IS PULLED FROM SERVER.'.format(path), Fore.WHITE)
                         file.close()
+                    print(Fore.WHITE)
 
                 # add contributor
                 elif option == 4:
@@ -550,15 +553,17 @@ class Client:
                             msg = 'pull-a-repo`{}`{}'.format(self.username, choice)
                             self.send_message(s, msg)
                             n = int(self.receive_message_from_server(s, print_it=False))
+                            print(Fore.YELLOW)
                             for i in tqdm(range(n), desc='PULL FROM SERVER'):
-                                repo, path, data = self.receive_message_from_server(s, print_it=True).split('`')
+                                repo, path, data = self.receive_message_from_server(s, print_it=False).split('`')
                                 make_directory(repo, self.ROOT_PATH)
                                 parent = os.path.join(self.ROOT_PATH, repo)
                                 os.chdir(parent)
                                 file = open(path, 'w')
                                 file.write(data)
-                                print(Fore.YELLOW, '{} IS PULLED FROM SERVER.'.format(path), Fore.WHITE)
+                                # print(Fore.YELLOW, '{} IS PULLED FROM SERVER.'.format(path), Fore.WHITE)
                                 file.close()
+                            print(Fore.WHITE)
 
                     # cls()
                 except ValueError:
