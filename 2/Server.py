@@ -92,6 +92,11 @@ class Server:
         print('\tstatus  :\tREPOSITORY \"{}\" ({}) CREATED FOR USER \"{}\"'.format(repo_name, prvt_or_pblc, username))
         self.send_message_to_client(c, 'repository created successfully'.upper())
 
+        # initial commit
+        insert_into_table(self.conn_db, 'users_commits',
+                          'username, repository, file_path, file_content, message, commit_time',
+                          (username, repo_name, '', '', 'initial_commit', datetime.datetime.now()))
+
     def update_password(self, username, new_password):
         update_password(self.conn_db, new_password, username)
 
@@ -216,18 +221,32 @@ class Server:
                     repo = received_message[2]
                     last_commit_time = received_message[3]
 
-                    # print(username, repo, last_commit_time)
+                    # check if we are the contributor
+                    cur = self.conn_db.cursor()
+                    q = "SELECT contributor FROM users_repositories WHERE repo_name = \'{}\'" \
+                        .format(repo)
+                    cur.execute(q)
+                    contributors = cur.fetchall()
+                    owner = username
+                    for cc in contributors:
+                        list_of_contrinutors = cc[0].split()
+                        if username in list_of_contrinutors:
+                            owner = cc[0][0]
+                    # print('owner: ', owner)
 
                     cur = self.conn_db.cursor()
                     q = "SELECT * FROM {} WHERE repository = \'{}\' and commit_time = \'{}\' and username = \'{}\'" \
                         .format('users_commits', repo, last_commit_time, username)
-
                     cur.execute(q)
                     files = cur.fetchall()
+
                     self.send_message_to_client(c, str(len(files)))
 
-                    parent_path = os.path.join(self.WORKING_DIRECTORY, username)
+                    parent_path = os.path.join(self.WORKING_DIRECTORY, owner)
+                    make_directory(repo, parent_path)
+                    
                     parent_path = os.path.join(parent_path, repo)
+
                     os.chdir(parent_path)
                     # shutil.rmtree(parent_path)
                     children = os.listdir(parent_path)
@@ -238,7 +257,7 @@ class Server:
                     print('\tSTATUS  :\t')
                     for f in files:
                         try:
-                            parent_path = os.path.join(self.WORKING_DIRECTORY, username)
+                            parent_path = os.path.join(self.WORKING_DIRECTORY, owner)
                             parent_path = os.path.join(parent_path, repo)
                             os.chdir(parent_path)
                             # shutil.rmtree(parent_path)
@@ -250,7 +269,7 @@ class Server:
                             file = open(f[2], 'w')
                             file.write(f[3])
                             self.send_message_to_client(c, 'FILE {} IS PUSHED TO SERVER'.format(f[2]))
-                            print('\t         \t{} PUSHED SUCCESSFULLY'.format(f[2]))
+                            print('\t         \t{} PUSHED SUCCESSFULLY TO {}'.format(f[2], parent_path))
                             # print('\t         \tCONTENT: {}'.format(f[3]))
                             file.close()
                         except Exception as e:
@@ -305,7 +324,7 @@ class Server:
                     response = ''
                     i = 1
                     for r in users:
-                        response += '   {} - {}'.format(i, r[0])
+                        response += '   {} - {}\n'.format(i, r[0])
                         i += 1
                     self.send_message_to_client(c, response)
 
@@ -402,7 +421,6 @@ class Server:
                         print('\tstatus  :\tPULLING \"{}\"'.format(p[2]))
                         self.send_message_to_client(c, record)
 
-
                 # pull a repository from main menu
                 elif command == 'pull-a-repo':
                     username = received_message[1]
@@ -415,6 +433,7 @@ class Server:
                         u_name, repo_name, p, collabs = r[0], r[1], r[2], r[3].split()
                         if p == 'PRVT' and username not in collabs:
                             repositories.remove(r)
+                    print(repositories)
                     selected_repo = repositories[index - 1]
                     u_name, repo_name = selected_repo[0], selected_repo[1]
                     cur = self.conn_db.cursor()
@@ -427,7 +446,9 @@ class Server:
                     for t in times:
                         tt.append(t[0])
 
+
                     last_push_time = max(tt)
+
 
                     cur = self.conn_db.cursor()
                     q = "SELECT * FROM {} WHERE commit_time = \'{}\'" \

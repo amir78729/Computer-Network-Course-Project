@@ -99,6 +99,7 @@ class Client:
             print(e)
         self.conn_db = conn_user_password
 
+        # TODO add username to db (for contributors)
         # create commits table
         create_user_table_query = """ CREATE TABLE IF NOT EXISTS commits (
                                                                 repository text,
@@ -286,10 +287,16 @@ class Client:
                         # make_directory(repo, self.ROOT_PATH)
                         parent = os.path.join(self.ROOT_PATH, repo)
                         os.chdir(parent)
-                        file = open(path, 'w')
-                        file.write(data)
-                        # print(Fore.YELLOW, '{} IS PULLED FROM SERVER.'.format(path), Fore.WHITE)
-                        file.close()
+                        try:
+                            file = open(path, 'w')
+                            file.write(data)
+                            # print(Fore.YELLOW, '{} IS PULLED FROM SERVER.'.format(path), Fore.WHITE)
+                            file.close()
+                        except FileNotFoundError:
+                            pass
+                    insert_into_table(self.conn_db, 'commits',
+                                      'repository, file_path, file_content, message, commit_time',
+                                      (repo, '', '', 'initial_commit', datetime.datetime.now()))
                     print(Fore.WHITE)
 
                 # add contributor
@@ -454,6 +461,11 @@ class Client:
                         self.send_message(s, msg)
                         self.receive_message_from_server(s, print_it=True)
 
+                        # initial commit
+                        insert_into_table(self.conn_db, 'commits',
+                                          ' repository, file_path, file_content, message, commit_time',
+                                          (repository_name, '', '', 'initial_commit', datetime.datetime.now()))
+
                     # show repositories (local)
                     elif option == 2:
                         repositories = os.listdir(self.ROOT_PATH)
@@ -554,15 +566,25 @@ class Client:
                             self.send_message(s, msg)
                             n = int(self.receive_message_from_server(s, print_it=False))
                             print(Fore.YELLOW)
+                            repo = ''
                             for i in tqdm(range(n), desc='PULL FROM SERVER'):
                                 repo, path, data = self.receive_message_from_server(s, print_it=False).split('`')
                                 make_directory(repo, self.ROOT_PATH)
                                 parent = os.path.join(self.ROOT_PATH, repo)
                                 os.chdir(parent)
-                                file = open(path, 'w')
-                                file.write(data)
-                                # print(Fore.YELLOW, '{} IS PULLED FROM SERVER.'.format(path), Fore.WHITE)
-                                file.close()
+                                try:
+                                    file = open(path, 'w')
+                                    file.write(data)
+                                    # print(Fore.YELLOW, '{} IS PULLED FROM SERVER.'.format(path), Fore.WHITE)
+                                    file.close()
+                                except FileNotFoundError:
+                                    pass
+
+                            # initial commit
+                            insert_into_table(self.conn_db, 'commits',
+                                              ' repository, file_path, file_content, message, commit_time',
+                                              (repo, '', '', 'initial_commit', datetime.datetime.now()))
+
                             print(Fore.WHITE)
 
                     # cls()
