@@ -7,7 +7,7 @@ from colorama import Fore, Back, Style
 import sqlite3
 from sqlite3 import Error
 from tqdm import tqdm
-
+import time
 
 def copy_directory(src, dst):
     shutil.copytree(src, dst, copy_function=shutil.copy)
@@ -133,11 +133,11 @@ class Client:
         client.send(message_length)
         client.send(message)
 
-    def commit(self, files, repo, message, time):
+    def commit(self, files, repo, message, current_time):
         if not files:
             insert_into_table(self.conn_db, 'commits',
                               'repository, file_path, file_content, message, commit_time',
-                              (repo, '', '', message, time))
+                              (repo, '', '', message, current_time))
 
         for file_name in tqdm(files, desc="COMMITTING FILES"):
             file_content = open(file_name, 'r')
@@ -146,8 +146,33 @@ class Client:
             # insert commit tp database
             insert_into_table(self.conn_db, 'commits',
                               'repository, file_path, file_content, message, commit_time',
-                              (repo, path, file_content.read(), message, time))
+                              (repo, path, file_content.read(), message, current_time))
         print('FILES ARE ADDED TO LOCAL DATABASE.')
+
+        cur = self.conn_db.cursor()
+        cur.execute("SELECT * FROM {} WHERE commit_time = \'{}\'".format('commits', current_time))
+        new_commits = cur.fetchall()
+
+        # get times
+        cur = self.conn_db.cursor()
+        cur.execute("SELECT DISTINCT commit_time FROM {} ORDER BY commit_time".format('commits'))
+        times = cur.fetchall()
+        # new commit
+        cur = self.conn_db.cursor()
+        cur.execute(
+            "SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-1][0]))
+
+        # print(cur.fetchall())
+        last_commit = set(cur.fetchall())
+
+        # last commit
+        cur = self.conn_db.cursor()
+        cur.execute(
+            "SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-2][0]))
+        # print(cur.fetchall())
+        before_last_commit = set(cur.fetchall())
+        # self.print_commifs_diff(old=before_last_commit, new=last_commit)
+        self.print_commits(commits=new_commits, old=before_last_commit, new=last_commit)
 
     def print_commits(self, commits, old, new):
         print(' * USERNAME  : {}\n'
@@ -186,15 +211,17 @@ class Client:
                                    ' 3 - pull this repository from server\n'
                                    ' 4 - add contributor\n'
                                    ' 5 - show all pending commits (local)\n'
+                                   ' 6 - show all pending commits (server)\n'
                                    '-1 - back to menu\n'
                                    ' > '.upper()))
                 # main menu
                 if option == -1:
+                    self.current_directory = self.ROOT_PATH
                     return
 
                 # commit
                 elif option == 1:
-                    time = datetime.datetime.now()
+                    current_time = datetime.datetime.now()
                     files = os.listdir(self.current_directory)
 
                     commit_it = False
@@ -202,30 +229,7 @@ class Client:
                     if message != '-1':
                         commit_it = True
                     if commit_it:
-                        self.commit(files, repo, message, time)
-                        cur = self.conn_db.cursor()
-                        cur.execute("SELECT * FROM {} WHERE commit_time = \'{}\'".format('commits', time))
-                        new_commits = cur.fetchall()
-
-                        # get times
-                        cur = self.conn_db.cursor()
-                        cur.execute("SELECT DISTINCT commit_time FROM {} ORDER BY commit_time".format('commits'))
-                        times = cur.fetchall()
-                        # new commit
-                        cur = self.conn_db.cursor()
-                        cur.execute(
-                            "SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-1][0]))
-                        # print(cur.fetchall())
-                        last_commit = set(cur.fetchall())
-
-                        # last commit
-                        cur = self.conn_db.cursor()
-                        cur.execute(
-                            "SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-2][0]))
-                        # print(cur.fetchall())
-                        before_last_commit = set(cur.fetchall())
-                        # self.print_commifs_diff(old=before_last_commit, new=last_commit)
-                        self.print_commits(commits=new_commits, old=before_last_commit, new=last_commit)
+                        self.commit(files, repo, message, current_time)
 
                     else:
                         print(Fore.RED, 'CANCELED!', Fore.WHITE)
@@ -274,6 +278,58 @@ class Client:
                 elif option == 3:
                     msg = 'pull-my-repo`{}`{}'.format(self.username, repo)
                     self.send_message(s, msg)
+
+                    current_files = os.listdir(self.current_directory)
+                    current_files_data = []
+                    for f in current_files:
+                        d = open(f, 'r')
+                        current_files_data.append(d.read())
+                        d.close()
+
+                    # get last commit time
+                    cur = self.conn_db.cursor()
+                    cur.execute("SELECT DISTINCT commit_time FROM {} ORDER BY commit_time".format('commits'))
+                    last_commit_time = cur.fetchall()[-1][0]
+                    # print(last_commit_time)
+
+                    cur = self.conn_db.cursor()
+                    q = "SELECT file_path FROM {} WHERE repository = \'{}\' and commit_time = \'{}\'" \
+                        .format('commits', repo, last_commit_time)
+                    cur.execute(q)
+                    lcf = cur.fetchall()
+                    last_commit_files = []
+                    for l in lcf:
+                        last_commit_files.append(l[0])
+
+                    last_commit_files, current_files = set(last_commit_files), set(current_files)
+
+                    green = current_files - last_commit_files
+                    yellow = current_files & last_commit_files
+                    red = last_commit_files - current_files
+
+                    for g in green:
+                        if g != '':
+                            print('   ', Fore.GREEN, '[+]', g[0], Fore.WHITE)
+                    for y in yellow:
+                        if y != '':
+                            print('   ', Fore.YELLOW, '[*]', y[0], Fore.WHITE)
+                    for r in red:
+                        if r != '':
+                            print('   ', Fore.RED, '[-]', r[0], Fore.WHITE)
+
+                    if green or red:
+                        print('unsaved changes!'.upper())
+                        if input('do you want to commit changes? (enter 1 to commit) '.upper()) == '1':
+                            # commit
+                            print('committing...'.upper())
+                            self.commit(current_files, repo, 'THE COMMIT BEFORE PULLING', datetime.datetime.now())
+                        else:
+                            print('committing has been canceled.'.upper())
+                    else:
+                        print('no unsaved changes founded.'.upper())
+
+                    print('starting the pulling process...'.upper())
+
                     n = int(self.receive_message_from_server(s, print_it=False))
                     print(Fore.YELLOW)
                     for i in tqdm(range(n), desc='PULL FROM SERVER'):
@@ -288,9 +344,13 @@ class Client:
                             file.close()
                         except FileNotFoundError:
                             pass
-                    insert_into_table(self.conn_db, 'commits',
-                                      'repository, file_path, file_content, message, commit_time',
-                                      (repo, '', '', 'initial_commit', datetime.datetime.now()))
+
+                    # # initial commit
+                    # insert_into_table(self.conn_db, 'commits',
+                    #                   'repository, file_path, file_content, message, commit_time',
+                    #                   (repo, '', '', 'PULLED FROM SERVER, EMPTY COMMIT', datetime.datetime.now()))
+                    current_files = os.listdir(self.current_directory)
+                    self.commit(current_files, repo, 'PULLED FROM SERVER', datetime.datetime.now())
                     print(Fore.WHITE)
 
                 # add contributor
@@ -345,6 +405,21 @@ class Client:
                         else:
                             self.print_commits(commits=cc, old=file_names[c - 1], new=file_names[c])
                         print()
+
+                # show all commits server TODO
+                elif option == 6:
+                    msg = 'show-commits`{}`{}'.format(self.username, repo)
+                    self.send_message(s, msg)
+
+                    n = self.receive_message_from_server(s, print_it=False)
+                    for i in range(int(n)):
+                        self.receive_message_from_server(s, print_it=True)
+                        ff = self.receive_message_from_server(s, print_it=False)
+                        for j in range(int(ff)):
+                            self.receive_message_from_server(s, print_it=True)
+                        print('-' * 36)
+
+
             except Exception as e:
                 if e == 'list index out of range':
                     pass
@@ -408,10 +483,11 @@ class Client:
         if not flag:
             print('connection closed\nplease try again later'.upper())
         else:
-
+            time.sleep(.5)
+            cls()
             while True:
                 try:
-                    hr()
+
                     print(Fore.LIGHTBLACK_EX, 'logged-in as     :'.upper(), self.username, Fore.WHITE)
                     print(Fore.LIGHTBLACK_EX,  'current directory:'.upper(), self.current_directory, Fore.WHITE)
                     option = int(input('please select an option\n'
@@ -460,7 +536,7 @@ class Client:
                         # initial commit
                         insert_into_table(self.conn_db, 'commits',
                                           ' repository, file_path, file_content, message, commit_time',
-                                          (repository_name, '', '', 'initial_commit', datetime.datetime.now()))
+                                          (repository_name, '', '', 'REPOSITORY CREATED', datetime.datetime.now()))
 
                     # show repositories (local)
                     elif option == 2:
@@ -576,16 +652,20 @@ class Client:
                                 except FileNotFoundError:
                                     pass
 
-                            # initial commit
-                            insert_into_table(self.conn_db, 'commits',
-                                              ' repository, file_path, file_content, message, commit_time',
-                                              (repo, '', '', 'initial_commit', datetime.datetime.now()))
+                            # # initial commit
+                            # insert_into_table(self.conn_db, 'commits',
+                            #                   ' repository, file_path, file_content, message, commit_time',
+                            #                   (repo, '', '', 'PULLED FROM SERVER, EMPTY COMMIT', datetime.datetime.now()))
+
+                            current_files = os.listdir(os.path.join(self.ROOT_PATH, repo))
+                            self.commit(current_files, repo, 'PULLED FROM SERVER', datetime.datetime.now())
 
                             print(Fore.WHITE)
 
                     # cls()
                 except ValueError:
                     print(Fore.RED, 'bad input! try again', Fore.WHITE)
+                hr()
 
 
 if __name__ == '__main__':

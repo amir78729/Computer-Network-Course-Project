@@ -357,6 +357,39 @@ class Server:
                         self.send_message_to_client(c, record)
                         i += 1
 
+                # show all commits
+                elif command == 'show-commits':
+                    username = received_message[1]
+                    repo = received_message[2]
+
+                    cur = self.conn_db.cursor()
+                    q = "SELECT commit_time, message from users_commits WHERE repository = \'{}\' and username = \'{}\' ORDER BY commit_time" \
+                        .format(repo, username)
+                    cur.execute(q)
+                    times = cur.fetchall()
+                    tt = []
+                    mm = []
+                    for t in times:
+                        tt.append(t[0])
+                        mm.append(t[1])
+
+                    self.send_message_to_client(c, str(len(tt)))
+
+                    for t, m in zip(tt, mm):
+                        self.send_message_to_client(c, 'TIME    : {}\n'
+                                                       'MESSAGE : \"{}\"'.format(t, m))
+                        cur = self.conn_db.cursor()
+                        q = "SELECT file_path from users_commits WHERE repository = \'{}\' and username = \'{}\'and commit_time = \'{}\'" \
+                            .format(repo, username, t)
+                        cur.execute(q)
+                        files = cur.fetchall()
+
+                        self.send_message_to_client(c, str(len(files)))
+                        for ff in files:
+                            self.send_message_to_client(c, '    {}'.format(ff[0]))
+
+
+
                 # pull a specific repository
                 elif command == 'pull-my-repo':
                     username = received_message[1]
