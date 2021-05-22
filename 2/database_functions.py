@@ -81,6 +81,12 @@ def check_password(conn_user_password, username, password):
 
 
 def delete_user_from_database(conn_user_password, username):
+    """
+    delete a user from db
+    :param conn_user_password:
+    :param username:
+    :return:
+    """
     cur = conn_user_password.cursor()
     cur.execute("DELETE FROM users_passwords WHERE username=\'{}\'".format(username))
     conn_user_password.commit()
@@ -103,7 +109,7 @@ def check_if_user_exists(conn_user_password, username):
 
 def update_password(conn_user_password, new_password, username):
     """
-    Create a new task
+    update password
     :param conn_user_password:
     :param new_password:
     :param username:
@@ -141,29 +147,3 @@ def update_contributor(conn_user_password, contributor, repo_name, username):
         print(e)
     return cur.lastrowid
 
-def creat_repo_db():
-    pass
-
-# def get_response_from_cache(conn_user_password, hostname_record_recursion):
-#     """
-#     use the cache
-#     :param conn_user_password: the Connection object
-#     :param hostname_record_recursion:
-#     :return:
-#     """
-#     cur = conn_user_password.cursor()
-#     cur.execute("SELECT RESPONSE FROM dns_cache WHERE HOSTNAME_RECORD_RECURSION=?", (hostname_record_recursion,))
-#     rows = cur.fetchall()
-#     return rows
-
-
-# def clear_cache(conn_user_password):
-#     """
-#     Delete all rows in the table
-#     :param conn_user_password: Connection to the SQLite database
-#     :return:
-#     """
-#     sql = 'DELETE FROM dns_cache'
-#     cur = conn_user_password.cursor()
-#     cur.execute(sql)
-#     conn_user_password.commit()

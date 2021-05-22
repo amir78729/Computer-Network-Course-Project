@@ -112,14 +112,6 @@ class Server:
     def delete_user(self, username):
         delete_user_from_database(self.conn_db, username)
 
-    # TODO : search file transfer
-    def receive_file_from_client(self, ):
-        pass
-
-    # TODO : search file transfer
-    def send_file_to_client(self, ):
-        pass
-
     def handle_client(self, c, addr):
         # c.send(str.encode('Server is working:'))
         print('someone is connected!'.upper())
@@ -194,7 +186,7 @@ class Server:
                     for repo in repositories:
                         self.send_message_to_client(c, '   - ' + repo)
 
-                # get commits from users database and add to server commit table TODO db insert is not working
+                # get commits from users database and add to server commit table
                 elif command == 'commit':
                     username = received_message[1]
                     repository = received_message[2]
@@ -215,7 +207,6 @@ class Server:
                           .format(file_path, message, username, repository))
 
                 # push
-                # TODO : create a table in database
                 elif command == 'push':
                     username = received_message[1]
                     repo = received_message[2]
@@ -278,41 +269,6 @@ class Server:
                         except Exception as e:
                             print('\t         \t{}'.format(e))
                             self.send_message_to_client(c, '!!! ERROR FOR PUSHING {}'.format(f[2]))
-
-                    # try:
-                    #     path = os.path.join(self.WORKING_DIRECTORY, username)
-                    #     path = os.path.join(path, repo)
-                    #     os.chdir(path)
-                    #     file = open(file_name, 'w')
-                    #     file.write(file_content)
-                    #     self.send_message_to_client(c, 'FILE {} IS PUSHED TO SERVER'.format(file_name))
-                    #     file.close()
-                    #     print('\tstatus  :\tsuccessful'.upper())
-                    # except Exception as e:
-                    #     print('\tSTATUS  :\t{}'.format(e))
-                    #     self.send_message_to_client(c, '!!! ERROR FOR PUSHING {}'.format(file_name))
-
-                    # username = received_message[1]
-                    # repo = received_message[2]
-                    # file_name = received_message[3]
-                    # file_size = received_message[4]
-                    # file_content = received_message[5]
-                    # print('\tUSERNAME:\t{}'.format(username))
-                    # print('\tREPO.   :\t{}'.format(repo))
-                    # print('\tF.NAME  :\t{}'.format(file_name))
-                    # print('\tF.SIZE  :\t{}'.format(file_size))
-                    # try:
-                    #     path = os.path.join(self.WORKING_DIRECTORY, username)
-                    #     path = os.path.join(path, repo)
-                    #     os.chdir(path)
-                    #     file = open(file_name, 'w')
-                    #     file.write(file_content)
-                    #     self.send_message_to_client(c, 'FILE {} IS PUSHED TO SERVER'.format(file_name))
-                    #     file.close()
-                    #     print('\tstatus  :\tsuccessful'.upper())
-                    # except Exception as e:
-                    #     print('\tSTATUS  :\t{}'.format(e))
-                    #     self.send_message_to_client(c, '!!! ERROR FOR PUSHING {}'.format(file_name))
 
                 # show all users
                 elif command == 'show-users':
@@ -401,10 +357,6 @@ class Server:
                         self.send_message_to_client(c, record)
                         i += 1
 
-                    # self.send_message_to_client(c, str(len(repositories)))
-                    # for repo in repositories:
-                    #     self.send_message_to_client(c, '    - '+repo)
-
                 # pull a specific repository
                 elif command == 'pull-my-repo':
                     username = received_message[1]
@@ -476,6 +428,7 @@ class Server:
                 elif command == 'disconnect':
                     username = received_message[1]
                     self.active_users.remove(username)
+                    self.send_message_to_client(c, "YOU ARE DISCONNECTED FROM SERVER")
                     connected = False
 
                 # change password

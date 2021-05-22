@@ -125,14 +125,6 @@ class Client:
             print(Fore.YELLOW + received_message + Fore.WHITE)
         return received_message
 
-    # TODO : search file transfer
-    def receive_file_from_server(self, ):
-        pass
-
-    # TODO : search file transfer
-    def send_file_to_server(self, ):
-        pass
-
     def send_message(self, client, msg):
         message = msg.encode(self.ENCODING)
         message_length = len(message)
@@ -184,7 +176,9 @@ class Client:
         while True:
             try:
                 hr()
-                print(Fore.LIGHTBLACK_EX, 'current directory:'.upper(), self.current_directory, Fore.WHITE)
+                print(Fore.LIGHTBLACK_EX, 'logged-in as       :'.upper(), self.username, Fore.WHITE)
+                print(Fore.LIGHTBLACK_EX, 'current repository :'.upper(), repo, Fore.WHITE)
+                print(Fore.LIGHTBLACK_EX, 'current directory  :'.upper(), self.current_directory, Fore.WHITE)
                 print('repository: '.upper(), repo)
                 option = int(input('please select an option\n'
                                    ' 1 - commit\n'
@@ -418,6 +412,7 @@ class Client:
             while True:
                 try:
                     hr()
+                    print(Fore.LIGHTBLACK_EX, 'logged-in as     :'.upper(), self.username, Fore.WHITE)
                     print(Fore.LIGHTBLACK_EX,  'current directory:'.upper(), self.current_directory, Fore.WHITE)
                     option = int(input('please select an option\n'
                                        ' 1 - create repository\n'
@@ -436,6 +431,7 @@ class Client:
                         if input('are you sure? (enter 1 to continue)'.upper()) == '1':
                             msg = 'disconnect`{}'.format(self.username)
                             self.send_message(s, msg)
+                            self.receive_message_from_server(s, print_it=True)
                             s.close()
                             break  # end of program
 
