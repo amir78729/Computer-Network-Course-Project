@@ -21,5 +21,12 @@ def remove_directory(target_folder_name, parent_directory):
         path = os.path.join(parent_directory, target_folder_name)
         shutil.rmtree(path)
 
+
 def copy_directory(src, dst):
     shutil.copytree(src, dst, copy_function=shutil.copy)
+
+
+def remove_directory_contents(directory):
+    for root, dirs, files in os.walk(directory):
+        for name in files:
+            os.remove(os.path.join(root, name))

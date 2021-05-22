@@ -244,11 +244,14 @@ class Server:
 
                     parent_path = os.path.join(self.WORKING_DIRECTORY, owner)
                     make_directory(repo, parent_path)
-                    
+
                     parent_path = os.path.join(parent_path, repo)
 
                     os.chdir(parent_path)
                     # shutil.rmtree(parent_path)
+
+                    remove_directory_contents(parent_path)
+
                     children = os.listdir(parent_path)
                     # print(children)
                     # for c in children:
@@ -384,9 +387,17 @@ class Server:
                             p = 'PRIVATE'
                         else:
                             p = 'PUBLIC'
-                        record = '   {} - NAME: \"{}\"\n     PRVT/PBLC: {}\n     CONTRIBUTOR: {} \n'.format(i,
-                                                                                                            repo_name,
-                                                                                                            p, collabs)
+                        record = '   {} - NAME: \"{}\"\n     PRVT/PBLC: {}\n     CONTRIBUTOR:\n'.format(i,
+                                                                                                        repo_name,
+                                                                                                        p)
+                        is_owner = True
+                        for collab in collabs:
+                            record += '     |- {}'.format(collab)
+                            if is_owner:
+                                record += ' (OWNER)\n'
+                            else:
+                                record += '\n'
+                            is_owner = False
                         self.send_message_to_client(c, record)
                         i += 1
 
