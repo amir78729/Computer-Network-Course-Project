@@ -2,10 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1a122ee9-44fd-44c9-a16d-16ab3c1f5f96" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/12/asdasdasdasdasdasdasdasd (1) - Copy.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/12/asdasdasdasdasdasdasdasd (2) - Copy.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/12/time - Copy (2).txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/12/time - Copy - Copy.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/33/asdasdasdasdas.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CLIENT_ROOT/33/asdasdasdasdas.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/Client.py" beforeDir="false" afterPath="$PROJECT_DIR$/CLIENT_ROOT/Client.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/client_database.sql" beforeDir="false" afterPath="$PROJECT_DIR$/CLIENT_ROOT/client_database.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CN-P2.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/CN-P2.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GIT/2/33/asd.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Server.py" beforeDir="false" afterPath="$PROJECT_DIR$/Server.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server_database.sql" beforeDir="false" afterPath="$PROJECT_DIR$/server_database.sql" afterDir="false" />
     </list>
@@ -31,11 +35,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="388" column="80" selection-start-line="388" selection-start-column="80" selection-end-line="388" selection-end-column="80" />
+            <state relative-caret-position="258">
+              <caret line="233" selection-start-line="233" selection-end-line="233" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -43,11 +47,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/CLIENT_ROOT/Client.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="106">
-              <caret line="410" column="45" selection-start-line="410" selection-start-column="45" selection-end-line="410" selection-end-column="45" />
+            <state relative-caret-position="-3585">
+              <caret line="241" column="76" selection-start-line="241" selection-start-column="76" selection-end-line="241" selection-end-column="76" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -58,8 +62,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/database_functions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1428">
-              <caret line="84" column="25" selection-start-line="84" selection-start-column="25" selection-end-line="84" selection-end-column="25" />
+            <state relative-caret-position="-1438">
+              <caret line="45" column="10" selection-start-line="45" selection-start-column="10" selection-end-line="45" selection-end-column="10" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -95,14 +99,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>insert</find>
-      <find>users_commits</find>
-      <find>WHERE</find>
-      <find>users_comm</find>
-      <find>tqdm</find>
-      <find>shutil</find>
-      <find>os.</find>
-      <find>send</find>
       <find>NO COMMI</find>
       <find>canceled</find>
       <find>commit_time</find>
@@ -125,6 +121,14 @@
       <find>datetime.datetime.</find>
       <find>PULLED FROM SERVER</find>
       <find>times</find>
+      <find>owner</find>
+      <find>manage_repository</find>
+      <find>last_co</find>
+      <find>last_comm</find>
+      <find>last_commit_t</find>
+      <find>last_commit_time</find>
+      <find>list</find>
+      <find>hr()</find>
     </findStrings>
     <replaceStrings>
       <replace>delete_user_from_database</replace>
@@ -155,13 +159,13 @@
         <option value="$PROJECT_DIR$/server_database.sql" />
         <option value="$PROJECT_DIR$/directiry_management_functions.py" />
         <option value="$PROJECT_DIR$/database_functions.py" />
-        <option value="$PROJECT_DIR$/CLIENT_ROOT/Client.py" />
         <option value="$PROJECT_DIR$/Server.py" />
+        <option value="$PROJECT_DIR$/CLIENT_ROOT/Client.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-12" />
+    <option name="x" value="565" />
     <option name="width" value="981" />
     <option name="height" value="522" />
   </component>
@@ -330,23 +334,22 @@
       <workItem from="1621331485882" duration="27246000" />
       <workItem from="1621438451118" duration="1391000" />
       <workItem from="1621591254787" duration="5351000" />
-      <workItem from="1621653013534" duration="18619000" />
+      <workItem from="1621653013534" duration="33870000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="187578000" />
+    <option name="totallyTimeSpent" value="202829000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14955537" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32978722" />
-      <window_info active="true" anchor="bottom" x="22" y="247" width="1237" height="186" id="Run" order="2" visible="true" weight="0.2960993" />
+      <window_info active="true" anchor="bottom" x="22" y="247" width="1237" height="186" id="Run" order="2" visible="true" weight="0.7358156" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -370,7 +373,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/2$Client.coverage" NAME="Client Coverage Results" MODIFIED="1620596027726" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/2$main.coverage" NAME="main Coverage Results" MODIFIED="1619128379669" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/2$Server.coverage" NAME="Server Coverage Results" MODIFIED="1621693714191" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/2$Server.coverage" NAME="Server Coverage Results" MODIFIED="1621755207727" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/2$Client___.coverage" NAME="Client (۱) Coverage Results" MODIFIED="1620596276118" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/CLIENT_ROOT" />
   </component>
   <component name="editorHistoryManager">
@@ -401,16 +404,6 @@
     <entry file="file://$PROJECT_DIR$/server_database.sql">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/database_functions.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1428">
-          <caret line="84" column="25" selection-start-line="84" selection-start-column="25" selection-end-line="84" selection-end-column="25" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/directiry_management_functions.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="340">
@@ -421,20 +414,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CLIENT_ROOT/Client.py">
+    <entry file="file://$PROJECT_DIR$/Server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="106">
-          <caret line="410" column="45" selection-start-line="410" selection-start-column="45" selection-end-line="410" selection-end-column="45" />
+        <state relative-caret-position="258">
+          <caret line="233" selection-start-line="233" selection-end-line="233" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Server.py">
+    <entry file="file://$PROJECT_DIR$/database_functions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="388" column="80" selection-start-line="388" selection-start-column="80" selection-end-line="388" selection-end-column="80" />
+        <state relative-caret-position="-1438">
+          <caret line="45" column="10" selection-start-line="45" selection-start-column="10" selection-end-line="45" selection-end-column="10" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CLIENT_ROOT/Client.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3585">
+          <caret line="241" column="76" selection-start-line="241" selection-start-column="76" selection-end-line="241" selection-end-column="76" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>

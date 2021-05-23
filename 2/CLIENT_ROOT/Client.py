@@ -9,6 +9,7 @@ from sqlite3 import Error
 from tqdm import tqdm
 import time
 
+
 def copy_directory(src, dst):
     shutil.copytree(src, dst, copy_function=shutil.copy)
 
@@ -50,6 +51,9 @@ def insert_into_table(conn_user_password, table, fields, values):
 
 
 def cls():
+    """
+    clear the terminal
+    """
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
@@ -57,7 +61,13 @@ def hr():
     print('-'*60)
 
 
+
 def make_directory(new_folder_name, parent_directory):
+    """
+    create a new directory in the parent path
+    :param new_folder_name:
+    :param parent_directory:
+    """
     try:
         path = os.path.join(parent_directory, new_folder_name)
         os.mkdir(path)
@@ -68,6 +78,12 @@ def make_directory(new_folder_name, parent_directory):
 
 
 def remove_directory(target_folder_name, parent_directory):
+    """
+    remove a directory (if not empty use shutil.rmtree() )
+    :param target_folder_name:
+    :param parent_directory:
+    :return:
+    """
     try:
         path = os.path.join(parent_directory, target_folder_name)
         os.rmdir(path)
@@ -99,7 +115,6 @@ class Client:
             print(e)
         self.conn_db = conn_user_password
 
-        # TODO add username to db (for contributors)
         # create commits table
         create_user_table_query = """ CREATE TABLE IF NOT EXISTS commits (
                                                                 repository text,
@@ -134,6 +149,13 @@ class Client:
         client.send(message)
 
     def commit(self, files, repo, message, current_time):
+        """
+        add a commit to the local db
+        :param files:
+        :param repo:
+        :param message:
+        :param current_time:
+        """
         if not files:
             insert_into_table(self.conn_db, 'commits',
                               'repository, file_path, file_content, message, commit_time',
@@ -157,36 +179,41 @@ class Client:
         cur = self.conn_db.cursor()
         cur.execute("SELECT DISTINCT commit_time FROM {} ORDER BY commit_time".format('commits'))
         times = cur.fetchall()
+
         # new commit
         cur = self.conn_db.cursor()
-        cur.execute(
-            "SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-1][0]))
-
-        # print(cur.fetchall())
+        cur.execute("SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-1][0]))
         last_commit = set(cur.fetchall())
 
         # last commit
         cur = self.conn_db.cursor()
-        cur.execute(
-            "SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-2][0]))
-        # print(cur.fetchall())
+        cur.execute("SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-2][0]))
         before_last_commit = set(cur.fetchall())
-        # self.print_commifs_diff(old=before_last_commit, new=last_commit)
+
         self.print_commits(commits=new_commits, old=before_last_commit, new=last_commit)
 
     def print_commits(self, commits, old, new):
+        """
+        print commit info
+        :param commits:
+        :param old:
+        :param new:
+        :return:
+        """
         print(' * USERNAME  : {}\n'
               ' | REPOSITORY: {}\n'
               ' | MESSAGE   : {}\n'
               ' | TIME      : {}'.format(self.username, commits[0][0], commits[0][3], commits[0][4]))
         print(' | FILES')
+        # printing contents of this commit
         for c in commits:
             print(' |-', Fore.CYAN, c[1], Fore.WHITE)
+
+        # print differences
         print(' | DIFFERENCES FROM LAST COMMIT')
         green = new - old
         yellow = new & old
         red = old - new
-
         for g in green:
             if g != '':
                 print(' |-', Fore.GREEN, '[+]', g[0], Fore.WHITE)
@@ -197,7 +224,7 @@ class Client:
             if r != '':
                 print(' |-', Fore.RED, '[-]', r[0], Fore.WHITE)
 
-    def manage_repository(self, s,  repo, repo_dir):
+    def manage_repository(self, s,  repo):
         while True:
             try:
                 hr()
@@ -211,7 +238,8 @@ class Client:
                                    ' 3 - pull this repository from server\n'
                                    ' 4 - add contributor\n'
                                    ' 5 - show all pending commits (local)\n'
-                                   ' 6 - show all pending commits (server)\n'
+                                   ' 6 - show all submitted commits (server)\n'
+                                   ' 7 - check synchronization with server\n'
                                    '-1 - back to menu\n'
                                    ' > '.upper()))
                 # main menu
@@ -223,18 +251,15 @@ class Client:
                 elif option == 1:
                     current_time = datetime.datetime.now()
                     files = os.listdir(self.current_directory)
-
                     commit_it = False
                     message = input('INSERT COMMIT MESSAGE: (-1 TO CANCEL)\n > ')
                     if message != '-1':
                         commit_it = True
                     if commit_it:
                         self.commit(files, repo, message, current_time)
-
                     else:
                         print(Fore.RED, 'CANCELED!', Fore.WHITE)
 
-                # TODO send from database not local
                 # push
                 elif option == 2:
                     # send commits to server's commit database:
@@ -290,7 +315,6 @@ class Client:
                     cur = self.conn_db.cursor()
                     cur.execute("SELECT DISTINCT commit_time FROM {} ORDER BY commit_time".format('commits'))
                     last_commit_time = cur.fetchall()[-1][0]
-                    # print(last_commit_time)
 
                     cur = self.conn_db.cursor()
                     q = "SELECT file_path FROM {} WHERE repository = \'{}\' and commit_time = \'{}\'" \
@@ -334,21 +358,15 @@ class Client:
                     print(Fore.YELLOW)
                     for i in tqdm(range(n), desc='PULL FROM SERVER'):
                         repo, path, data = self.receive_message_from_server(s, print_it=False).split('`')
-                        # make_directory(repo, self.ROOT_PATH)
                         parent = os.path.join(self.ROOT_PATH, repo)
                         os.chdir(parent)
                         try:
                             file = open(path, 'w')
                             file.write(data)
-                            # print(Fore.YELLOW, '{} IS PULLED FROM SERVER.'.format(path), Fore.WHITE)
                             file.close()
                         except FileNotFoundError:
                             pass
 
-                    # # initial commit
-                    # insert_into_table(self.conn_db, 'commits',
-                    #                   'repository, file_path, file_content, message, commit_time',
-                    #                   (repo, '', '', 'PULLED FROM SERVER, EMPTY COMMIT', datetime.datetime.now()))
                     current_files = os.listdir(self.current_directory)
                     self.commit(current_files, repo, 'PULLED FROM SERVER', datetime.datetime.now())
                     print(Fore.WHITE)
@@ -406,7 +424,7 @@ class Client:
                             self.print_commits(commits=cc, old=file_names[c - 1], new=file_names[c])
                         print()
 
-                # show all commits server TODO
+                # show all commits server
                 elif option == 6:
                     msg = 'show-commits`{}`{}'.format(self.username, repo)
                     self.send_message(s, msg)
@@ -419,6 +437,71 @@ class Client:
                             self.receive_message_from_server(s, print_it=True)
                         print('-' * 36)
 
+                # check synchronization
+                elif option == 7:
+                    msg = 'check-synchronization`{}`{}'.format(self.username, repo)
+                    self.send_message(s, msg)
+
+                    # server files
+                    current_files_server = []
+                    current_data_server = []
+                    n = self.receive_message_from_server(s, print_it=False)
+                    for i in range(int(n)):
+                        current_files_server.append(self.receive_message_from_server(s, print_it=False))
+                        current_data_server.append(self.receive_message_from_server(s, print_it=False))
+
+                    # client files
+                    current_files_client = os.listdir(self.current_directory)
+                    current_data_client = []
+                    for f in current_files_client:
+                        d = open(f, 'r')
+                        current_data_client.append(d.read())
+                        d.close()
+
+                    current_files_client, current_files_server = set(current_files_client), set(current_files_server)
+
+                    green = current_files_client - current_files_server
+                    yellow = current_files_client & current_files_server
+                    red = current_files_server - current_files_client
+
+                    for g in green:
+                        if g != '':
+                            print('   ', Fore.GREEN, '[+]', g, Fore.WHITE)
+                    for y in yellow:
+                        if y != '':
+                            print('   ', Fore.YELLOW, '[*]', y, Fore.WHITE)
+                    for r in red:
+                        if r != '':
+                            print('   ', Fore.RED, '[-]', r, Fore.WHITE)
+
+                    print()
+                    if red or green:
+                        print(Fore.RED, '    NOT SYNCHRONIZED!', Fore.WHITE)
+                    else:
+                        is_sync = True
+                        for c_file, c_data, s_file, s_data in zip(list(current_files_client), current_data_client,
+                                                                  list(current_files_server), current_data_server):
+
+                            if c_file in yellow:
+                                print('CHECKING \"{}\": '.format(c_file), end=' ')
+                                if c_data != s_data:
+                                    print(Fore.RED, 'MODIFICATION DETECTED!', Fore.WHITE)
+                                    is_sync = False
+                                    print(Fore.YELLOW, end='')
+                                    print('\"{}\" IN SERVER:'.format(s_file), Fore.BLACK, Back.YELLOW)
+                                    print(s_data)
+                                    print(Fore.CYAN, Back.BLACK)
+                                    print('\"{}\" IN CLIENT:'.format(c_file), Fore.BLACK, Back.CYAN)
+                                    print(c_data)
+                                    print(Fore.WHITE, Back.BLACK)
+                                else:
+                                    print(Fore.GREEN, 'NOT MODIFIED', Fore.WHITE)
+                                print()
+
+                        if not is_sync:
+                            print(Fore.RED, '    NOT SYNCHRONIZED!', Fore.WHITE)
+                        else:
+                            print(Fore.GREEN, '    SYNCHRONIZED!', Fore.WHITE)
 
             except Exception as e:
                 if e == 'list index out of range':
@@ -427,11 +510,11 @@ class Client:
                     print(e)
 
     def main(self):
-        # global username
         cls()
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         flag = False  # a boolean variable to configure if the user can use the service or not
 
+        # trying to connect to the server...
         print('connecting to server...'.upper())
         try:
             s.connect((self.ADDRESS, self.PORT))
@@ -446,14 +529,13 @@ class Client:
                            '-1 - cancel\n'.upper()))
         if option == -1:
             print('closing the connection...'.upper())
-            # send_message(s, 'disconnect ')
             s.close()
+
         else:
             # login
             if option == 1:
                 print('login:'.upper())
                 username = input(' > username:  '.upper())
-                # password = input(' > password:  '.upper())
                 password = getpass.getpass(' > password:  '.upper())
                 msg = 'login`{}`{}'.format(username, password)
 
@@ -483,11 +565,10 @@ class Client:
         if not flag:
             print('connection closed\nplease try again later'.upper())
         else:
-            time.sleep(.5)
+            time.sleep(1)
             cls()
             while True:
                 try:
-
                     print(Fore.LIGHTBLACK_EX, 'logged-in as     :'.upper(), self.username, Fore.WHITE)
                     print(Fore.LIGHTBLACK_EX,  'current directory:'.upper(), self.current_directory, Fore.WHITE)
                     option = int(input('please select an option\n'
@@ -586,9 +667,10 @@ class Client:
                                         print(Fore.GREEN, 'REPOSITORY \"{}\" SELECTED!'.format(current_repository), Fore.WHITE)
                                         self.current_directory = os.path.join(self.ROOT_PATH, current_repository)
                                         os.chdir(self.current_directory)
-                                        self.manage_repository(s, current_repository, self.current_directory)
+
+                                        # entering the repository menu
+                                        self.manage_repository(s, current_repository)
                                         self.current_directory = self.ROOT_PATH
-                                        # os.chdir(self.current_directory)
                                         break
                                     else:
                                         print(Fore.RED, 'please enter a valid input'.upper(), Fore.WHITE)
@@ -624,6 +706,7 @@ class Client:
 
                     # pull a repository from main menu
                     elif option == 8:
+                        # getting options from the server
                         msg = 'show-repo-all`{}'.format(self.username)
                         self.send_message(s, msg)
                         n = int(self.receive_message_from_server(s, print_it=False))
@@ -647,19 +730,12 @@ class Client:
                                 try:
                                     file = open(path, 'w')
                                     file.write(data)
-                                    # print(Fore.YELLOW, '{} IS PULLED FROM SERVER.'.format(path), Fore.WHITE)
                                     file.close()
                                 except FileNotFoundError:
                                     pass
 
-                            # # initial commit
-                            # insert_into_table(self.conn_db, 'commits',
-                            #                   ' repository, file_path, file_content, message, commit_time',
-                            #                   (repo, '', '', 'PULLED FROM SERVER, EMPTY COMMIT', datetime.datetime.now()))
-
                             current_files = os.listdir(os.path.join(self.ROOT_PATH, repo))
                             self.commit(current_files, repo, 'PULLED FROM SERVER', datetime.datetime.now())
-
                             print(Fore.WHITE)
 
                     # cls()

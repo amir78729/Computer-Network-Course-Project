@@ -112,6 +112,25 @@ class Server:
     def delete_user(self, username):
         delete_user_from_database(self.conn_db, username)
 
+    def get_owner(self, repo, username, ):
+        """
+        find tho owner of a repo
+        :param repo:
+        :param username:
+        :return: owner
+        """
+        cur = self.conn_db.cursor()
+        q = "SELECT contributor FROM users_repositories WHERE repo_name = \'{}\'" \
+            .format(repo)
+        cur.execute(q)
+        contributors = cur.fetchall()
+        owner = username
+        for cc in contributors:
+            list_of_contrinutors = cc[0].split()
+            if username in list_of_contrinutors:
+                owner = cc[0][0]
+        return owner
+
     def handle_client(self, c, addr):
         # c.send(str.encode('Server is working:'))
         print('someone is connected!'.upper())
@@ -186,6 +205,37 @@ class Server:
                     for repo in repositories:
                         self.send_message_to_client(c, '   - ' + repo)
 
+                #
+                elif command == 'check-synchronization':
+                    username = received_message[1]
+                    repo = received_message[2]
+
+                    # fine the owner
+                    owner = self.get_owner(repo, username)
+
+                    # get last commit time
+                    cur = self.conn_db.cursor()
+                    cur.execute("SELECT DISTINCT commit_time FROM {} WHERE username = \'{}\' ORDER BY commit_time"
+                                .format('users_commits', username))
+                    last_commit_time = cur.fetchall()[-1][0]
+
+                    cur = self.conn_db.cursor()
+                    q = "SELECT * FROM {} WHERE repository = \'{}\' and commit_time = \'{}\' and username = \'{}\'" \
+                        .format('users_commits', repo, last_commit_time, username)
+                    cur.execute(q)
+                    files = cur.fetchall()
+
+                    self.send_message_to_client(c, str(len(files)))
+
+                    for f in files:
+                        self.send_message_to_client(c, f[2])
+                        self.send_message_to_client(c, f[3])
+
+
+
+
+
+
                 # get commits from users database and add to server commit table
                 elif command == 'commit':
                     username = received_message[1]
@@ -213,40 +263,19 @@ class Server:
                     last_commit_time = received_message[3]
 
                     # check if we are the contributor
-                    cur = self.conn_db.cursor()
-                    q = "SELECT contributor FROM users_repositories WHERE repo_name = \'{}\'" \
-                        .format(repo)
-                    cur.execute(q)
-                    contributors = cur.fetchall()
-                    owner = username
-                    for cc in contributors:
-                        list_of_contrinutors = cc[0].split()
-                        if username in list_of_contrinutors:
-                            owner = cc[0][0]
-                    # print('owner: ', owner)
+                    owner = self.get_owner(repo, username)
 
                     cur = self.conn_db.cursor()
                     q = "SELECT * FROM {} WHERE repository = \'{}\' and commit_time = \'{}\' and username = \'{}\'" \
                         .format('users_commits', repo, last_commit_time, username)
                     cur.execute(q)
                     files = cur.fetchall()
-
                     self.send_message_to_client(c, str(len(files)))
-
                     parent_path = os.path.join(self.WORKING_DIRECTORY, owner)
                     make_directory(repo, parent_path)
-
                     parent_path = os.path.join(parent_path, repo)
-
                     os.chdir(parent_path)
-                    # shutil.rmtree(parent_path)
-
                     remove_directory_contents(parent_path)
-
-                    children = os.listdir(parent_path)
-                    # print(children)
-                    # for c in children:
-                    #     os.remove(c)
 
                     print('\tSTATUS  :\t')
                     for f in files:
@@ -254,12 +283,6 @@ class Server:
                             parent_path = os.path.join(self.WORKING_DIRECTORY, owner)
                             parent_path = os.path.join(parent_path, repo)
                             os.chdir(parent_path)
-                            # shutil.rmtree(parent_path)
-                            # children = os.listdir(parent_path)
-                            # print(children)
-                            # for c in children:
-                            #     os.remove(c)
-
                             file = open(f[2], 'w')
                             file.write(f[3])
                             self.send_message_to_client(c, 'FILE {} IS PUSHED TO SERVER'.format(f[2]))
