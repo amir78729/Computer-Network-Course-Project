@@ -14,6 +14,17 @@ def copy_directory(src, dst):
     shutil.copytree(src, dst, copy_function=shutil.copy)
 
 
+def list_files_in_tree(startpath):
+    contents = []
+    for root, dirs, files in os.walk(startpath):
+        for f in files:
+            if os.path.relpath(root) == '.':
+                contents.append('{}'.format(f))
+            else:
+                contents.append('{}\\{}'.format(os.path.relpath(root), f))
+    return contents
+
+
 def get_table(conn, table):
     """
     Query all rows in the tasks table
@@ -182,12 +193,12 @@ class Client:
 
         # new commit
         cur = self.conn_db.cursor()
-        cur.execute("SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-1][0]))
+        cur.execute("SELECT file_path, file_content FROM {} WHERE commit_time = \'{}\'".format('commits', times[-1][0]))
         last_commit = set(cur.fetchall())
 
         # last commit
         cur = self.conn_db.cursor()
-        cur.execute("SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[-2][0]))
+        cur.execute("SELECT file_path, file_content FROM {} WHERE commit_time = \'{}\'".format('commits', times[-2][0]))
         before_last_commit = set(cur.fetchall())
 
         self.print_commits(commits=new_commits, old=before_last_commit, new=last_commit)
@@ -211,18 +222,54 @@ class Client:
 
         # print differences
         print(' | DIFFERENCES FROM LAST COMMIT')
-        green = new - old
-        yellow = new & old
-        red = old - new
+
+        new_ = []
+        old_ = []
+        dic_new = dict()
+        dic_old = dict()
+        for n in new:
+            if n[0] not in new_:
+                new_.append(n[0])
+                dic_new.update({n[0]: n[1]})
+        for o in old:
+            if o[0] not in old_:
+                old_.append(o[0])
+                dic_old.update({o[0]: o[1]})
+
+        new_, old_ = set(new_), set(old_)
+
+        green = new_ - old_
+        yellow = new_ & old_
+        red = old_ - new_
         for g in green:
             if g != '':
-                print(' |-', Fore.GREEN, '[+]', g[0], Fore.WHITE)
+                print(' |-', Fore.GREEN, '[+]', g, Fore.WHITE)
         for y in yellow:
             if y != '':
-                print(' |-', Fore.YELLOW, '[*]', y[0], Fore.WHITE)
+                # # get times
+                # cur = self.conn_db.cursor()
+                # cur.execute("SELECT DISTINCT commit_time FROM {} ORDER BY commit_time".format('commits'))
+                # times = cur.fetchall()
+                #
+                # cur = self.conn_db.cursor()
+                # cur.execute("SELECT file_content FROM {} WHERE commit_time = \'{}\' AND file_path = \'{}\'"
+                #             .format('commits', times[-1][0], y[0]))
+                # last_commit_content = (cur.fetchall())
+                # print(last_commit_content[0])
+                #
+                # cur = self.conn_db.cursor()
+                # cur.execute("SELECT file_content FROM {} WHERE commit_time = \'{}\' AND file_path = \'{}\'"
+                #             .format('commits', times[-2][0], y[0]))
+                # before_last_commit_content = (cur.fetchall())
+
+                if dic_old[y] != dic_new[y]:  # modified
+                    print(' |-', Fore.YELLOW, '[*]', y, Fore.WHITE)
+                else:  # not modified
+                    print(' |-', Fore.LIGHTBLACK_EX, '[*]', y, Fore.WHITE)
+
         for r in red:
             if r != '':
-                print(' |-', Fore.RED, '[-]', r[0], Fore.WHITE)
+                print(' |-', Fore.RED, '[-]', r, Fore.WHITE)
 
     def manage_repository(self, s,  repo):
         while True:
@@ -251,6 +298,10 @@ class Client:
                 elif option == 1:
                     current_time = datetime.datetime.now()
                     files = os.listdir(self.current_directory)
+                    print(files)
+                    files = list_files_in_tree(self.current_directory)
+                    print(files)
+
                     commit_it = False
                     message = input('INSERT COMMIT MESSAGE: (-1 TO CANCEL)\n > ')
                     if message != '-1':
@@ -411,7 +462,7 @@ class Client:
 
                     for c in range(len(times)):
                         cur = self.conn_db.cursor()
-                        cur.execute("SELECT file_path FROM {} WHERE commit_time = \'{}\'".format('commits', times[c][0]))
+                        cur.execute("SELECT file_path, file_content FROM {} WHERE commit_time = \'{}\'".format('commits', times[c][0]))
                         file_names.append(set(cur.fetchall()))
 
                     for c in range(len(times)):
