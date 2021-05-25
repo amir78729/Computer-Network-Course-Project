@@ -82,7 +82,6 @@ def make_directory(new_folder_name, parent_directory):
     try:
         path = os.path.join(parent_directory, new_folder_name)
         os.mkdir(path)
-        print('DIRECTORY \"{}\" CREATED'.format(new_folder_name))
     except Exception as e:
         # print(e)
         pass
@@ -190,18 +189,20 @@ class Client:
         cur = self.conn_db.cursor()
         cur.execute("SELECT DISTINCT commit_time FROM {} ORDER BY commit_time".format('commits'))
         times = cur.fetchall()
+        try:
+            # new commit
+            cur = self.conn_db.cursor()
+            cur.execute("SELECT file_path, file_content FROM {} WHERE commit_time = \'{}\'".format('commits', times[-1][0]))
+            last_commit = set(cur.fetchall())
 
-        # new commit
-        cur = self.conn_db.cursor()
-        cur.execute("SELECT file_path, file_content FROM {} WHERE commit_time = \'{}\'".format('commits', times[-1][0]))
-        last_commit = set(cur.fetchall())
+            # last commit
+            cur = self.conn_db.cursor()
+            cur.execute("SELECT file_path, file_content FROM {} WHERE commit_time = \'{}\'".format('commits', times[-2][0]))
+            before_last_commit = set(cur.fetchall())
 
-        # last commit
-        cur = self.conn_db.cursor()
-        cur.execute("SELECT file_path, file_content FROM {} WHERE commit_time = \'{}\'".format('commits', times[-2][0]))
-        before_last_commit = set(cur.fetchall())
-
-        self.print_commits(commits=new_commits, old=before_last_commit, new=last_commit)
+            self.print_commits(commits=new_commits, old=before_last_commit, new=last_commit)
+        except IndexError:
+            pass
 
     def print_commits(self, commits, old, new):
         """
@@ -211,17 +212,18 @@ class Client:
         :param new:
         :return:
         """
-        print(' * USERNAME  : {}\n'
-              ' | REPOSITORY: {}\n'
-              ' | MESSAGE   : {}\n'
-              ' | TIME      : {}'.format(self.username, commits[0][0], commits[0][3], commits[0][4]))
-        print(' | FILES')
+        print(' ■ ───────────────────────────────────────')
+        print(' ├─ USERNAME  : {}\n'
+              ' ├─ REPOSITORY: {}\n'
+              ' ├─ MESSAGE   : {}\n'
+              ' ├─ TIME      : {}'.format(self.username, commits[0][0], commits[0][3], commits[0][4]))
+        print(' ├─ FILES')
         # printing contents of this commit
         for c in commits:
-            print(' |-', Fore.CYAN, c[1], Fore.WHITE)
+            print(' │ ', Fore.CYAN, c[1], Fore.WHITE)
 
         # print differences
-        print(' | DIFFERENCES FROM LAST COMMIT')
+        print(' ├─ DIFFERENCES FROM LAST COMMIT')
 
         new_ = []
         old_ = []
@@ -243,33 +245,18 @@ class Client:
         red = old_ - new_
         for g in green:
             if g != '':
-                print(' |-', Fore.GREEN, '[+]', g, Fore.WHITE)
+                print(' │ ', Fore.GREEN, '[+]', g, Fore.WHITE)
         for y in yellow:
             if y != '':
-                # # get times
-                # cur = self.conn_db.cursor()
-                # cur.execute("SELECT DISTINCT commit_time FROM {} ORDER BY commit_time".format('commits'))
-                # times = cur.fetchall()
-                #
-                # cur = self.conn_db.cursor()
-                # cur.execute("SELECT file_content FROM {} WHERE commit_time = \'{}\' AND file_path = \'{}\'"
-                #             .format('commits', times[-1][0], y[0]))
-                # last_commit_content = (cur.fetchall())
-                # print(last_commit_content[0])
-                #
-                # cur = self.conn_db.cursor()
-                # cur.execute("SELECT file_content FROM {} WHERE commit_time = \'{}\' AND file_path = \'{}\'"
-                #             .format('commits', times[-2][0], y[0]))
-                # before_last_commit_content = (cur.fetchall())
-
                 if dic_old[y] != dic_new[y]:  # modified
-                    print(' |-', Fore.YELLOW, '[*]', y, Fore.WHITE)
+                    print(' │ ', Fore.YELLOW, '[*]', y, Fore.WHITE)
                 else:  # not modified
-                    print(' |-', Fore.LIGHTBLACK_EX, '[*]', y, Fore.WHITE)
+                    print(' │ ', Fore.LIGHTBLACK_EX, '[*]', y, Fore.WHITE)
 
         for r in red:
             if r != '':
-                print(' |-', Fore.RED, '[-]', r, Fore.WHITE)
+                print(' │ ', Fore.RED, '[-]', r, Fore.WHITE)
+        print(' └────────────────────────────────────────')
 
     def manage_repository(self, s,  repo):
         while True:
@@ -297,10 +284,7 @@ class Client:
                 # commit
                 elif option == 1:
                     current_time = datetime.datetime.now()
-                    files = os.listdir(self.current_directory)
-                    print(files)
                     files = list_files_in_tree(self.current_directory)
-                    print(files)
 
                     commit_it = False
                     message = input('INSERT COMMIT MESSAGE: (-1 TO CANCEL)\n > ')
@@ -464,16 +448,18 @@ class Client:
                         cur = self.conn_db.cursor()
                         cur.execute("SELECT file_path, file_content FROM {} WHERE commit_time = \'{}\'".format('commits', times[c][0]))
                         file_names.append(set(cur.fetchall()))
-
-                    for c in range(len(times)):
-                        cur = self.conn_db.cursor()
-                        cur.execute("SELECT * FROM {} WHERE commit_time = \'{}\'".format('commits', times[c][0]))
-                        cc = cur.fetchall()
-                        if c == 0:
-                            self.print_commits(commits=cc, old=set([]), new=file_names[c])
-                        else:
-                            self.print_commits(commits=cc, old=file_names[c - 1], new=file_names[c])
-                        print()
+                    if len(times) > 0:
+                        for c in range(len(times)):
+                            cur = self.conn_db.cursor()
+                            cur.execute("SELECT * FROM {} WHERE commit_time = \'{}\'".format('commits', times[c][0]))
+                            cc = cur.fetchall()
+                            if c == 0:
+                                self.print_commits(commits=cc, old=set([]), new=file_names[c])
+                            else:
+                                self.print_commits(commits=cc, old=file_names[c - 1], new=file_names[c])
+                            print()
+                    else:
+                        print(Fore.RED, 'NO PENDING COMMIT', Fore.WHITE)
 
                 # show all commits server
                 elif option == 6:
@@ -502,13 +488,36 @@ class Client:
                         current_data_server.append(self.receive_message_from_server(s, print_it=False))
 
                     # client files
-                    current_files_client = os.listdir(self.current_directory)
-                    current_data_client = []
-                    for f in current_files_client:
-                        d = open(f, 'r')
-                        current_data_client.append(d.read())
-                        d.close()
+                    # current_files_client = os.listdir(self.current_directory)
 
+                    # try:
+                    current_files_client = list_files_in_tree(self.current_directory)
+
+                    current_data_client = []
+                    for path in current_files_client:
+                        parent_path = self.current_directory
+                        os.chdir(parent_path)
+                        sub_directories = path.split('\\')
+                        if len(sub_directories) == 1:
+                            d = open(path, 'r')
+                            current_data_client.append(d.read())
+                            d.close()
+                        else:
+                            for i in range(len(sub_directories) - 1):
+                                make_directory(sub_directories[i], parent_path)
+                                parent_path = os.path.join(parent_path, sub_directories[i])
+                                os.chdir(parent_path)
+                            d = open(sub_directories[-1], 'r')
+                            current_data_client.append(d.read())
+                            d.close()
+                    # except:
+                        # pass
+                        #
+                        # d = open(f, 'r')
+                        # current_data_client.append(d.read())
+
+                    self.current_directory = os.path.join(self.ROOT_PATH, repo)
+                    os.chdir(self.current_directory)
                     current_files_client, current_files_server = set(current_files_client), set(current_files_server)
 
                     green = current_files_client - current_files_server
@@ -776,16 +785,30 @@ class Client:
                             for i in tqdm(range(n), desc='PULL FROM SERVER'):
                                 repo, path, data = self.receive_message_from_server(s, print_it=False).split('`')
                                 make_directory(repo, self.ROOT_PATH)
-                                parent = os.path.join(self.ROOT_PATH, repo)
-                                os.chdir(parent)
-                                try:
+                                parent_path = os.path.join(self.ROOT_PATH, repo)
+                                os.chdir(parent_path)
+                                sub_directories = path.split('\\')
+                                if len(sub_directories) == 1:
                                     file = open(path, 'w')
                                     file.write(data)
                                     file.close()
-                                except FileNotFoundError:
-                                    pass
+                                else:
+                                    for i in range(len(sub_directories) - 1):
+                                        make_directory(sub_directories[i], parent_path)
+                                        parent_path = os.path.join(parent_path, sub_directories[i])
+                                        os.chdir(parent_path)
+                                    file = open(sub_directories[-1], 'w')
+                                    file.write(data)
+                                    file.close()
+                                # try:
+                                #     file = open(path, 'w')
+                                #     file.write(data)
+                                #     file.close()
+                                # except FileNotFoundError:
+                                #     pass
 
-                            current_files = os.listdir(os.path.join(self.ROOT_PATH, repo))
+                            # current_files = os.listdir(os.path.join(self.ROOT_PATH, repo))
+                            current_files = list_files_in_tree(os.path.join(self.ROOT_PATH, repo))
                             self.commit(current_files, repo, 'PULLED FROM SERVER', datetime.datetime.now())
                             print(Fore.WHITE)
 

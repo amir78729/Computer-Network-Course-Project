@@ -205,7 +205,7 @@ class Server:
                     for repo in repositories:
                         self.send_message_to_client(c, '   - ' + repo)
 
-                #
+
                 elif command == 'check-synchronization':
                     username = received_message[1]
                     repo = received_message[2]
@@ -213,23 +213,43 @@ class Server:
                     # fine the owner
                     owner = self.get_owner(repo, username)
 
-                    # get last commit time
-                    cur = self.conn_db.cursor()
-                    cur.execute("SELECT DISTINCT commit_time FROM {} WHERE username = \'{}\' ORDER BY commit_time"
-                                .format('users_commits', username))
-                    last_commit_time = cur.fetchall()[-1][0]
+                    try:
+                        # get last commit time
+                        cur = self.conn_db.cursor()
+                        cur.execute("SELECT DISTINCT commit_time FROM {} WHERE username = \'{}\' ORDER BY commit_time"
+                                    .format('users_commits', username))
+                        last_commit_time = cur.fetchall()[-1][0]
 
-                    cur = self.conn_db.cursor()
-                    q = "SELECT * FROM {} WHERE repository = \'{}\' and commit_time = \'{}\' and username = \'{}\'" \
-                        .format('users_commits', repo, last_commit_time, username)
-                    cur.execute(q)
-                    files = cur.fetchall()
+                        cur = self.conn_db.cursor()
+                        q = "SELECT * FROM {} WHERE repository = \'{}\' and commit_time = \'{}\' and username = \'{}\'" \
+                            .format('users_commits', repo, last_commit_time, username)
+                        cur.execute(q)
+                        files = cur.fetchall()
 
-                    self.send_message_to_client(c, str(len(files)))
+                        self.send_message_to_client(c, str(len(files)))
 
-                    for f in files:
-                        self.send_message_to_client(c, f[2])
-                        self.send_message_to_client(c, f[3])
+                        for f in files:
+                            self.send_message_to_client(c, f[2])
+                            self.send_message_to_client(c, f[3])
+
+                    except IndexError:
+                        # get last commit time
+                        cur = self.conn_db.cursor()
+                        cur.execute("SELECT DISTINCT commit_time FROM {} WHERE username = \'{}\' ORDER BY commit_time"
+                                    .format('users_commits', owner))
+                        last_commit_time = cur.fetchall()[-1][0]
+
+                        cur = self.conn_db.cursor()
+                        q = "SELECT * FROM {} WHERE repository = \'{}\' and commit_time = \'{}\' and username = \'{}\'" \
+                            .format('users_commits', repo, last_commit_time, owner)
+                        cur.execute(q)
+                        files = cur.fetchall()
+
+                        self.send_message_to_client(c, str(len(files)))
+
+                        for f in files:
+                            self.send_message_to_client(c, f[2])
+                            self.send_message_to_client(c, f[3])
 
 
 
@@ -283,8 +303,20 @@ class Server:
                             parent_path = os.path.join(self.WORKING_DIRECTORY, owner)
                             parent_path = os.path.join(parent_path, repo)
                             os.chdir(parent_path)
-                            file = open(f[2], 'w')
-                            file.write(f[3])
+                            sub_directories = f[2].split('\\')
+                            if len(sub_directories) == 1:
+                                file = open(f[2], 'w')
+                                file.write(f[3])
+                                file.close()
+
+                            else:
+                                for i in range(len(sub_directories) - 1):
+                                    make_directory(sub_directories[i], parent_path)
+                                    parent_path = os.path.join(parent_path, sub_directories[i])
+                                    os.chdir(parent_path)
+                                file = open(sub_directories[-1], 'w')
+                                file.write(f[3])
+                                file.close()
                             self.send_message_to_client(c, 'FILE {} IS PUSHED TO SERVER'.format(f[2]))
                             print('\t         \t{} PUSHED SUCCESSFULLY TO {}'.format(f[2], parent_path))
                             # print('\t         \tCONTENT: {}'.format(f[3]))

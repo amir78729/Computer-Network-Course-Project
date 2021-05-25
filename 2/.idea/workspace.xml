@@ -2,9 +2,45 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1a122ee9-44fd-44c9-a16d-16ab3c1f5f96" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/12/asdasdasdasdasdasdasdasd (1).txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/12/asdasdasdasdasdasdasdasd (2).txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/12/time - Copy.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/12/time.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/21/New Text Document - Copy (2).txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/21/New Text Document - Copy (3) - Copy.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/21/New Text Document - Copy (3).txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/21/New Text Document - Copy (4) - Copy.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/33/New folder/New folder/New Text Document - Copy.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/33/New folder/New folder/New Text Document.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/33/New folder/test.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/33/asd.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/33/asdasdasdasdas.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/Client.py" beforeDir="false" afterPath="$PROJECT_DIR$/CLIENT_ROOT/Client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/asd/New Text Document - Copy (2) - Copy.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/CLIENT_ROOT/client_database.sql" beforeDir="false" afterPath="$PROJECT_DIR$/CLIENT_ROOT/client_database.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GIT/1/12/asdasdasdasdasdasdasdasd (1) - Copy.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GIT/1/12/asdasdasdasdasdasdasdasd (1).txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GIT/1/12/asdasdasdasdasdasdasdasd (2) - Copy.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GIT/1/12/asdasdasdasdasdasdasdasd (2).txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GIT/1/12/time - Copy (2).txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GIT/1/12/time - Copy - Copy.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GIT/1/12/time - Copy.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GIT/1/12/time.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GIT/2/12/asdasdasdasdasdasdasdasd (1).txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GIT/2/12/asdasdasdasdasdasdasdasd (2).txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GIT/2/12/time - Copy.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GIT/2/12/time.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GIT/2/21/New Text Document - Copy (2).txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GIT/2/21/New Text Document - Copy (3) - Copy.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GIT/2/21/New Text Document - Copy (3).txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GIT/2/21/New Text Document - Copy (4) - Copy.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GIT/2/33/asd.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GIT/2/33/asdasdasdasdas.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GIT/2/asd/New Text Document - Copy (2) - Copy.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server.py" beforeDir="false" afterPath="$PROJECT_DIR$/Server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server_database.sql" beforeDir="false" afterPath="$PROJECT_DIR$/server_database.sql" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -31,8 +67,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="236" selection-start-line="236" selection-end-line="236" />
+            <state relative-caret-position="-288">
+              <caret line="208" column="39" selection-start-line="208" selection-start-column="33" selection-end-line="208" selection-end-column="39" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -43,8 +79,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/CLIENT_ROOT/Client.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="151">
-              <caret line="236" column="37" selection-start-line="236" selection-start-column="37" selection-end-line="236" selection-end-column="37" />
+            <state relative-caret-position="97">
+              <caret line="450" column="35" selection-start-line="450" selection-start-column="35" selection-end-line="450" selection-end-column="35" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -55,7 +91,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/database_functions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="486">
+            <state relative-caret-position="-613">
               <caret line="45" column="10" selection-start-line="45" selection-start-column="10" selection-end-line="45" selection-end-column="10" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
@@ -76,11 +112,6 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server_database.sql">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
     </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
@@ -92,16 +123,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>int</find>
-      <find>repo_nam</find>
-      <find>for i in tqdm(range(n), desc='PULL FROM SERVER'):</find>
-      <find>split</find>
-      <find>show all re</find>
-      <find>dated</find>
-      <find>file = open(path, 'w')</find>
-      <find>create re</find>
-      <find>|</find>
-      <find>CURRENT DIRECTORY</find>
       <find>pull</find>
       <find>insert_into_table(self.conn_db, 'commi</find>
       <find>last_commit_time</find>
@@ -122,6 +143,16 @@
       <find>print_commits</find>
       <find>file_content</find>
       <find>print_c</find>
+      <find>pushed</find>
+      <find>tree</find>
+      <find>listdi</find>
+      <find>[-2</find>
+      <find>sync</find>
+      <find>sub</find>
+      <find>check</find>
+      <find>open(</find>
+      <find>check-</find>
+      <find>self.curr</find>
     </findStrings>
     <replaceStrings>
       <replace>delete_user_from_database</replace>
@@ -149,9 +180,9 @@
         <option value="$PROJECT_DIR$/Client.py" />
         <option value="$PROJECT_DIR$/user_password.sql" />
         <option value="$PROJECT_DIR$/user_info.sql" />
-        <option value="$PROJECT_DIR$/server_database.sql" />
         <option value="$PROJECT_DIR$/directiry_management_functions.py" />
         <option value="$PROJECT_DIR$/database_functions.py" />
+        <option value="$PROJECT_DIR$/server_database.sql" />
         <option value="$PROJECT_DIR$/Server.py" />
         <option value="$PROJECT_DIR$/CLIENT_ROOT/Client.py" />
       </list>
@@ -330,12 +361,12 @@
       <workItem from="1621653013534" duration="33891000" />
       <workItem from="1621800090190" duration="360000" />
       <workItem from="1621860274138" duration="1902000" />
-      <workItem from="1621935671843" duration="4214000" />
+      <workItem from="1621935671843" duration="10429000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="209326000" />
+    <option name="totallyTimeSpent" value="215541000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
@@ -346,7 +377,7 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32978722" />
-      <window_info active="true" anchor="bottom" x="22" y="247" width="1237" height="186" id="Run" order="2" visible="true" weight="0.14893617" />
+      <window_info active="true" anchor="bottom" x="22" y="247" width="1237" height="186" id="Run" order="2" visible="true" weight="0.05319149" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -370,7 +401,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/2$Client.coverage" NAME="Client Coverage Results" MODIFIED="1620596027726" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/2$main.coverage" NAME="main Coverage Results" MODIFIED="1619128379669" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/2$Server.coverage" NAME="Server Coverage Results" MODIFIED="1621938459569" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/2$Server.coverage" NAME="Server Coverage Results" MODIFIED="1621945473106" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/2$Client___.coverage" NAME="Client (۱) Coverage Results" MODIFIED="1620596276118" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/CLIENT_ROOT" />
   </component>
   <component name="editorHistoryManager">
@@ -398,6 +429,9 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/server_database.sql">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/directiry_management_functions.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="323">
@@ -408,22 +442,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server_database.sql">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Server.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="236" selection-start-line="236" selection-end-line="236" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/database_functions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="486">
+        <state relative-caret-position="-613">
           <caret line="45" column="10" selection-start-line="45" selection-start-column="10" selection-end-line="45" selection-end-column="10" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
@@ -431,10 +452,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Server.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-288">
+          <caret line="208" column="39" selection-start-line="208" selection-start-column="33" selection-end-line="208" selection-end-column="39" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/CLIENT_ROOT/Client.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="151">
-          <caret line="236" column="37" selection-start-line="236" selection-start-column="37" selection-end-line="236" selection-end-column="37" />
+        <state relative-caret-position="97">
+          <caret line="450" column="35" selection-start-line="450" selection-start-column="35" selection-end-line="450" selection-end-column="35" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>
